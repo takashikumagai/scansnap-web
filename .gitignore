@@ -1,0 +1,4 @@
+__pychache__
+*.pyc
+*.log
+scansnap/static/scanned_documents

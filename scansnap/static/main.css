@@ -1,0 +1,31 @@
+#download-form {
+    visibility: hidden;
+}
+
+#download-button {
+    visibility: inherit;
+}
+
+.r {
+    color: rgb(255, 75, 75);
+}
+
+.g {
+    color: rgb(75, 255, 75);
+}
+
+.b {
+    color: rgb(75, 75, 255);
+}
+
+.dark {
+    color: #444;
+}
+
+.gray {
+    color: #888;
+}
+
+.silver {
+    color: #bbb;
+}

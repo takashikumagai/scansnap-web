@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<form action="" method="POST">
+
+    <!-- This is for protecting the site from CSRF (cross-site request forgery) -->
+    {{ form.hidden_tag() }}
+
+    <fieldset class="form-group">
+        <div class="container">
+            <div class="card mt-3 mb-4">
+                <div class="card-header">Paper Size</div>
+                <div class="card-body custom-control custom-radio">
+                    {% for subfield in form.paper_size %}
+                        <span class="p-4">{{ subfield(class="m-2 custom-control-input") }}{{ subfield.label(class="custom-control-label") }}</span>
+                    {% endfor %}                        
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Sides</div>
+                <!-- This generates a vertical list radio buttons -->
+                <!-- {{ form.sides }} -->
+                <div class="card-body custom-control custom-radio">
+                    {% for subfield in form.sides %}
+                        <span class="p-4">{{ subfield(class="m-2 custom-control-input") }}{{ subfield.label(class="custom-control-label") }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="a">
+                    <div class="card-header">Color</div>
+                    <div class="card-body custom-control custom-radio">
+                        {% for subfield in form.color %}
+                            <span class="p-4">{{ subfield(class="m-2 custom-control-input") }}{{ subfield.label(class="custom-control-label") }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Resolution</div>
+                <div class="card-body custom-control custom-radio">
+                    {% for subfield in form.resolution %}
+                        <div class="p-4">{{ subfield(class="m-2 custom-control-input") }}{{ subfield.label(class="custom-control-label") }}</div>
+                    {% endfor %}
+                </div>            
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Output Format</div>
+                <div class="card-body custom-control custom-radio">
+                    {% for subfield in form.output_format %}
+                        <span class="p-4">{{ subfield(class="m-2 custom-control-input") }}{{ subfield.label(class="custom-control-label") }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group px-3">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+<!--
+    Adding a button, instead of an anchor tag, which links to a file turned
+    out to be trickier than expected, and I simply couldn't find a way
+    other than creating a new form tag and adding a button there.
+-->
+<div class="container px-3 mb-4">
+    <form id="download-form" action="" target="_blank">
+        <button id="download-button" type="submit" class="btn btn-primary" onclick="">Download</button>
+    </form>    
+</div>
+
+{% endblock content %}
