@@ -1,10 +1,10 @@
 import logging
 import os
 import secrets
-from flask import render_template, redirect, url_for, current_app, request
+from flask import render_template, redirect, url_for, current_app, request, jsonify
 from scansnap import app
 from scansnap.forms import ScanSettingsForm
-from scansnap.utils import scan_and_save_results
+from scansnap.utils import scan_and_save_results, get_scanner_info_sync
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
@@ -44,3 +44,7 @@ def app_home():
         )
 
     return render_template('home.html', form=form)
+
+@app.route("/get-scanner-info", methods=['GET'])
+def get_scanner_info():
+    return jsonify(get_scanner_info_sync())

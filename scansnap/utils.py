@@ -248,3 +248,26 @@ def scan_and_save_results(
             })
 
     t.start()
+
+def get_scanner_info_sync():
+
+    try:
+        out = subprocess.check_output(['scanimage', '-L'], stderr=subprocess.STDOUT).decode('utf8')
+
+        if(0 <= out.find('No scanners were identified.')):
+            return {'scanner_found': False}
+        else:
+            # Example stdout when a scanner was found:
+            # device `fujitsu:ScanSnap iX500:1508641' is a FUJITSU ScanSnap iX500 scanner
+            m = re.search("' is a .+scanner$", out)
+
+            # Note that in Python's ternary expression, the condition
+            # is evaluated first, so the statement below does not throw
+            # an exception even when m is None
+            scanner_name = m.group(0)[7:-8] if m is not None else "Couldn't get the scanner name"
+            return {'scanner_found': True, 'scanner_name': scanner_name}
+
+    except subprocess.CalledProcessError:
+        print('CalledProcessError')
+
+    return {'scanner_found': False}
