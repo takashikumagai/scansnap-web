@@ -6,6 +6,14 @@
     visibility: inherit;
 }
 
+/*
+  Scan button is hidden by default.
+  Set to visible upon confirming that the scanner is available.
+*/
+#scan-btn-container {
+    visibility: hidden;
+}
+
 .r {
     color: rgb(255, 75, 75);
 }

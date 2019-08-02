@@ -45,3 +45,16 @@ webSocket.onerror = function(event) {
 webSocket.onclose = function(event) {
     console.log('ws closed:',event);
 }
+
+fetch('/get-scanner-info')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data.scanner_found) {
+            document.querySelector('#scan-btn-container').style.visibility = 'visible';
+            document.querySelector('#scanner-name').textContent = data.scanner_name;
+        } else {
+            document.querySelector('#scan-btn-container').style.visibility = 'hidden';
+            document.querySelector('#scanner-name').textContent = 'Scanner not found';
+        }
+    });
