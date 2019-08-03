@@ -1,5 +1,6 @@
 import datetime
 import logging
+import yaml # package: pyyaml
 from flask import Flask, current_app
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_bcrypt import Bcrypt
@@ -55,6 +56,17 @@ app.config.from_object(Config)
 
 ws_port = 2479
 scansnap.websocketserver.start_web_socket_server(ws_port)
+
+
+# Load settings for utils
+try:
+    with open('utils.yml') as f:
+        settings = yaml.safe_load(f)
+        logging.info('Loading configuration: {}'.format(str(settings)))
+        scansnap.utils.Settings.test_mode = (settings['test_mode'] == 'True')
+        scansnap.utils.Settings.sudo_scanimage = (settings['sudo_scanimage'] == 'True')
+except:
+    logging.info('Either utils.yml was not found or something else went wrong.')
 
 scansnap.utils.set_event_listener(scansnap.ScanEventListener.ScanEventListener())
 

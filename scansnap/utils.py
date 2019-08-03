@@ -6,7 +6,18 @@ import re
 import secrets
 import zipfile
 
-is_testing = True
+class Settings:
+
+    # If True, uses the fake scanimage command for testing,
+    # i.e. does not use a real scanner device.
+    test_mode = True
+
+    # TODO: find a way to execute scanimage without sudo
+    # On a Ubuntu 18.04 LTS PC (a small fanless box) that I have,
+    # sudo is required to execute the scanimage command, so I
+    # (reluctantly) added this option.
+    # On a laptop running 16.04, this is not necessary.
+    sudo_scanimage = True
 
 class EventListenerBase:
     def on_state_changed(self,data):
@@ -162,18 +173,9 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
                 output_pdf_filename='out.pdf',
                 save_images_as_zip=False):
 
-    global is_testing
-
     cmd = []
 
-    # On a Ubuntu 18.04 LTS PC (a small fanless box) that I am using, sudo is required to
-    # run scanimage. On a laptop running 16.04, this was not necessary, and I don't know
-    # what causes these differences.
-    scanimage_requires_sudo = False
-    if scanimage_requires_sudo:
-        cmd += ['sudo']
-
-    if is_testing:
+    if Settings.test_mode:
         cmd += ['./scanimage_test.py']
     else:
         cmd += ['scanimage']
@@ -210,6 +212,9 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     # front side only or duplex (front & back)
     source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
     cmd += ['--source', source]
+
+    if Settings.sudo_scanimage:
+        cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
     logging.info('cmd: {}'.format(cmd))
 
@@ -259,7 +264,14 @@ def scan_and_save_results(
 def get_scanner_info_sync():
 
     try:
-        out = subprocess.check_output(['scanimage', '-L'], stderr=subprocess.STDOUT).decode('utf8')
+        cmd = ['scanimage', '-L']
+
+        if Settings.sudo_scanimage:
+            cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
+
+        logging.info('scanner check cmd: {}'.format(cmd))
+
+        out = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode('utf8')
 
         if(0 <= out.find('No scanners were identified.')):
             return {'scanner_found': False}

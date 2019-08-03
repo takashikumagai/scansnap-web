@@ -10,6 +10,7 @@ flask = "*"
 flask-wtf = "*"
 pillow = "*"
 simplewebsocketserver = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"

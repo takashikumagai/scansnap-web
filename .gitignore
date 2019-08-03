@@ -1,4 +1,5 @@
 __pychache__
 *.pyc
 *.log
+utils.yml
 scansnap/static/scanned_documents
