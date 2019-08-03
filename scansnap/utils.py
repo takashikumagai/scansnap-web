@@ -27,6 +27,34 @@ def save_scanned_images_as_zip_file(img_files_dir, zip_file_path):
         for f in os.listdir(img_files_dir):
             pages_zip.write(f)
 
+def parse_stdout(stdout_lines):
+    for line in stdout_lines:
+        #line = line.decode('utf-8')
+        logging.info('stdout: {}'.format(line))
+
+def parse_stderr_and_send_events(stderr_lines):
+    global event_listener
+    scan_complete = False
+    for line in stderr_lines:
+        logging.info('scan stderr: {}'.format(line))
+
+        if line.startswith('Scanned page '):
+            m = re.search('(?<=Scanned page )\d+', line)
+            page = m.group(0)
+            event_listener.on_progress_updated({'scanned_page': page})
+        elif re.match('Batch terminated, \d+ page(s)? scanned', line):
+            logging.info('Batch terminated')
+            m = re.search('\d+', line)
+            scanned_pages = m.group(0)
+            event_listener.on_progress_updated({'last_scanned_page': scanned_pages})
+            event_listener.on_state_changed({'state': 'scan_complete', 'message': 'Scan complete'})
+            scan_complete = True
+        else:
+            logging.info('Some other stderr info')
+            logging.info(line)
+
+    return scan_complete
+
 # 1. Reads the stdout of the scanimage command and reports the status
 #    to the event listener, e.g. the scanner finished scanning i-th page
 # 2. If the scan is a success, starts converting the scanned image files into a PDF file.
@@ -43,34 +71,12 @@ def scan_and_convert_process_main_loop(
     scan_result = ''
     while(True):
 
-        #line = process.stdout.readline().decode('utf-8')
-        #err_line = process.stderr.readline()
-        #while(line or err_line):
-        logging.info('Iterating')
-        for line in process.stdout:
-
-            #line = line.decode('utf-8')
-            # stdout
-            logging.info('stdout: {}'.format(line))
-            if line.startswith('Scanned page '):
-                m = re.search('(?<=Scanned page )\d+', line)
-                page = m.group(0)
-                event_listener.on_progress_updated({'scanned_page': page})
-            elif re.match('Batch terminated, \d+ pages scanned', line):
-                m = re.search('\d+', line)
-                scanned_pages = m.group(0)
-                event_listener.on_progress_updated({'last_scanned_page': scanned_pages})
-                event_listener.on_state_changed({'state': 'scan_complete', 'message': 'Scan complete'})
-                scan_result = 'success'
-
-            #line = process.stdout.readline().decode('utf-8')
+        parse_stdout(process.stdout)
 
         # stderr
-        for line in process.stderr:
-            logging.info('scan stderr: {}'.format(line))
-            #err_line = process.stderr.readline()
-            #if err_line:
-            #    pass
+        scan_complete = parse_stderr_and_send_events(process.stderr)
+        if scan_complete:
+            scan_result = 'success'
 
         logging.info('Polling')
         rc = process.poll()
@@ -83,6 +89,7 @@ def scan_and_convert_process_main_loop(
 
     #event_listener.on_progress_updated('scan process terminated')
     if scan_result == 'success':
+        logging.info('Document scan complete')
 
         if save_images_as_zip:
             event_listener.on_state_changed({'state': 'compressing', 'message': 'Compressing image files...'})
@@ -187,7 +194,7 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     cmd += ['--resolution={}'.format(resolution)]
 
     # Color mode
-    mode = 'Grayscale' if color_mode == 'grayscale' else 'Color'
+    mode = 'Gray' if color_mode == 'grayscale' else 'Color'
     cmd += ['--mode', mode]
 
     # Set the output image format
@@ -201,7 +208,7 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     cmd += ['--batch={}'.format(os.path.join(output_dir,'out%03d.jpg'))]
 
     # front side only or duplex (front & back)
-    source = '"ADF Front"' if sides == 'front' else '"ADF Duplex"'
+    source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
     cmd += ['--source', source]
 
     logging.info('cmd: {}'.format(cmd))
