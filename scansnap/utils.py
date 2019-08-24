@@ -286,9 +286,10 @@ def get_scanner_info_sync():
             out = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode('utf8')
 
         if(0 <= out.find('No scanners were identified.')):
+            logging.info('Scanner not found')
             return {'scanner_found': False}
         else:
-            # Example stdout when a scanner was found:
+            # Example stdout when a scanner is found:
             # device `fujitsu:ScanSnap iX500:1508641' is a FUJITSU ScanSnap iX500 scanner
             m = re.search("' is a .+scanner$", out)
 
