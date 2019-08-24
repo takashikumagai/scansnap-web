@@ -9,6 +9,10 @@ import time
 import argparse
 from PIL import Image
 
+# Oddly enough, scanimage prints seemingly non-error message to stderr
+def print_to_stderr(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch')
 parser.add_argument('--mode')
@@ -36,7 +40,7 @@ img = Image.new('RGB', (256,256))
 num_pages = 5
 for i in range(1,num_pages+1):
     print('Scanning page {}'.format(i))
-    print('Scanned page {}. (scanner status = 5)'.format(i))
+    print_to_stderr('Scanned page {}. (scanner status = 5)'.format(i))
     # filename = 'out{}.png'.format(str(i).zfill(3))
     # img_path = os.path.join(output_dir,filename)
     img_path = output_fmt_str % (i)
@@ -45,4 +49,4 @@ for i in range(1,num_pages+1):
     time.sleep(1.0)
 
 print('scanimage: sane_start: Document feeder out of documents')
-print('Batch terminated, {} pages scanned'.format(num_pages))
+print_to_stderr('Batch terminated, {} pages scanned'.format(num_pages))
