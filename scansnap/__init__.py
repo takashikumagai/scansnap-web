@@ -63,8 +63,13 @@ try:
     with open('utils.yml') as f:
         settings = yaml.safe_load(f)
         logging.info('Loading configuration: {}'.format(str(settings)))
-        scansnap.utils.Settings.test_mode = (settings['test_mode'] == 'True')
-        scansnap.utils.Settings.sudo_scanimage = (settings['sudo_scanimage'] == 'True')
+        # True/False in yaml file is recognized as boolean values in Python,
+        # i.e. (settings['test_mode'] == 'True') will return False if lhs is
+        # True as it would be comparing a boolean value and a string
+        scansnap.utils.Settings.test_mode = settings['test_mode']
+        logging.info(settings['test_mode'])
+        logging.info('scansnap.utils.Settings.test_mode: '+str(scansnap.utils.Settings.test_mode))
+        scansnap.utils.Settings.sudo_scanimage = settings['sudo_scanimage']
 except:
     logging.info('Either utils.yml was not found or something else went wrong.')
 
