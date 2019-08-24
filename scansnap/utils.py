@@ -278,7 +278,12 @@ def get_scanner_info_sync():
 
         logging.info('scanner check cmd: {}'.format(cmd))
 
-        out = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode('utf8')
+        out = ''
+        logging.info('Settings.test_mode : {}'.format(Settings.test_mode))
+        if Settings.test_mode:
+            out = "device `hambina:NyankoScan N500:1607650' is a HAMBINA NyankoSnap N500 scanner"
+        else:
+            out = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode('utf8')
 
         if(0 <= out.find('No scanners were identified.')):
             return {'scanner_found': False}
