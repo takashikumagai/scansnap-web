@@ -196,6 +196,8 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
         w, h = 215, 297
     elif paper_size == 'a5-portrait':
         w, h = 150, 215
+    elif paper_size == 'a5-landscape':
+        w, h = 215, 150
 
     cmd += ['--page-width', str(w), '--page-height', str(h)]
 
