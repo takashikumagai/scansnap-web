@@ -46,6 +46,39 @@ webSocket.onclose = function(event) {
     console.log('ws closed:',event);
 }
 
+function getSelectedRadioButtonValue(radioButtonName) {
+    let radioButtons = document.querySelectorAll(`input[name="${radioButtonName}"]`);
+    for(btn of radioButtons) {
+        if(btn.checked) {
+            return btn.value;
+        }
+    }
+    return '';
+}
+
+function startScan() {
+    console.log('Starting the scan');
+    let scanParams = {
+        paper_size: getSelectedRadioButtonValue('paper_size'),
+        sides: getSelectedRadioButtonValue('sides'),
+        color: getSelectedRadioButtonValue('color'),
+        resolution: getSelectedRadioButtonValue('resolution'),
+        output_format: getSelectedRadioButtonValue('output_format')
+    };
+    (async () => {
+        const rawResponse = await fetch('/scan', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(scanParams)
+        });
+        const content = await rawResponse.json();
+        console.log(content);
+    })();
+}
+
 fetch('/get-scanner-info')
     .then(response => response.json())
     .then(data => {

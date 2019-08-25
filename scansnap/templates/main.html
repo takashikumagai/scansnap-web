@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<form action="" method="POST">
+
+    <fieldset class="form-group">
+        <div class="container">
+            <div class="card mt-3 mb-4">
+                <div class="card-header">Paper Size</div>
+                <div class="card-body custom-control custom-radio">
+                    <span class="p-4">
+                        <input type="radio" class="m-2" name="paper_size" value="a4-portrait" checked>A4 Portrait
+                        <input type="radio" class="m-2" name="paper_size" value="a5-portrait">A5 Portrait
+                        <input type="radio" class="m-2" name="paper_size" value="a4-landscape">A5 Landscape
+                    </span>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Sides</div>
+                <div class="card-body custom-control custom-radio">
+                    <span class="p-4">
+                        <input type="radio" class="m-2" name="sides" value="front">One side
+                        <input type="radio" class="m-2" name="sides" value="duplex" checked>Both sides (front & back)
+                    </span>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Color</div>
+                <div class="card-body custom-control custom-radio">
+                    <span class="p-4">
+                        <input type="radio" class="m-2" name="color" value="color" checked>Color
+                        <input type="radio" class="m-2" name="color" value="grayscale">Grayscale
+                    </span>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Resolution</div>
+                <div class="card-body custom-control custom-radio">
+                    <span class="p-4">
+                        <input type="radio" class="m-2" name="resolution" value="200" checked>200
+                        <input type="radio" class="m-2" name="resolution" value="300">300
+                        <input type="radio" class="m-2" name="resolution" value="400">400
+                    </span>
+                </div>            
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Output Format</div>
+                <div class="card-body custom-control custom-radio">
+                    <input type="radio" class="m-2" name="output_format" value="pdf" checked>PDF
+                    <input type="radio" class="m-2" name="output_format" value="jpeg">JPEG file(s)
+                    <input type="radio" class="m-2" name="output_format" value="pdf_and_jpeg">PDF & JPEG
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div id="scan-btn-container" class="form-group px-3">
+        <button class="btn btn-primary" type="button" onclick="startScan();">Scan</button>
+    </div>
+</form>
+
+<!--
+    Adding a button, instead of an anchor tag, which links to a file turned
+    out to be trickier than expected, and I simply couldn't find a way
+    other than creating a new form tag and adding a button there.
+-->
+<div class="container px-3 mb-4">
+    <form id="download-form" action="" target="_blank">
+        <button id="download-button" type="submit" class="btn btn-primary" onclick="">Download</button>
+    </form>    
+</div>
+
+{% endblock content %}
