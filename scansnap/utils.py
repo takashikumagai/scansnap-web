@@ -128,15 +128,8 @@ def scan_and_convert_process_main_loop(
     else:
         logging.info('scan_result!=success')
 
-def get_file_size_in_mb(pathname):
-    return os.stat(pathname).st_size / 1000.0 / 1000.0
-
-def get_human_readable_file_size(pathname):
-    size_in_bytes = os.stat(pathname).st_size
-    if 1000 * 1000 < size_in_bytes:
-        return '{0:.1} MB'.format(size_in_bytes / 1000.0 / 1000.0)
-    else:
-        return '{0:.1} KB'.format(size_in_bytes / 1000.0)
+def get_file_size_in_bytes(pathname):
+    return os.stat(pathname).st_size
 
 def convert_process_main_loop(process, output_pdf_pathname, download_pdf_url):
     while(True):
@@ -149,7 +142,7 @@ def convert_process_main_loop(process, output_pdf_pathname, download_pdf_url):
             logging.info('conversion returncode: {}'.format(rc))
             if rc == 0:
                 logging.info('download_pdf_url: {}'.format(download_pdf_url))
-                pdf_file_size = get_human_readable_file_size(output_pdf_pathname)
+                pdf_file_size = get_file_size_in_bytes(output_pdf_pathname)
                 event_listener.on_state_changed({
                     'state': 'conversion_complete', 
                     'download_pdf_url': download_pdf_url,
