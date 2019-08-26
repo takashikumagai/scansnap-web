@@ -191,6 +191,14 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
         w, h = 150, 215
     elif paper_size == 'a5-landscape':
         w, h = 215, 150
+    elif paper_size.find('custom') == 0:
+        logging.info('Custom paper size info: {}'.format(paper_size))
+        # Unpack paper_size (example: 'custom,125,80').
+        # Guard against floating-point numbers, e.g. 10.5
+        # by converting the string to float first.
+        w, h = [int(float(x)) for x in paper_size.split(',')[1:]]
+    else:
+        logging.warning('An unsupported paper size: {}'.format(paper_size))
 
     cmd += ['--page-width', str(w), '--page-height', str(h)]
 

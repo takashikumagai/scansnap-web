@@ -67,10 +67,31 @@ function getSelectedRadioButtonValue(radioButtonName) {
     return '';
 }
 
+function onFixedSizeClicked() {
+    document.querySelector('#custom-width').disabled = true;
+    document.querySelector('#custom-height').disabled = true;
+}
+
+function onCustomSizeClicked() {
+    document.querySelector('#custom-width').disabled = false;
+    document.querySelector('#custom-height').disabled = false;
+}
+
+// Encodes the custom paper size in the form of a comma-separated string
+// Example: 'custom,100,200'
+function encodeCustomPaperSize() {
+    return `custom,
+    ${document.querySelector('#custom-width').value.trim()},
+    ${document.querySelector('#custom-height').value.trim()}`;
+}
+
 function startScan() {
     console.log('Starting the scan');
+    const paperSizeValue = getSelectedRadioButtonValue('paper_size');
+    const paperSize = (paperSizeValue == 'custom-size') ?
+    encodeCustomPaperSize() : paperSizeValue;
     let scanParams = {
-        paper_size: getSelectedRadioButtonValue('paper_size'),
+        paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
         resolution: getSelectedRadioButtonValue('resolution'),

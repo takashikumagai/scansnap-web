@@ -8,11 +8,17 @@
             <div class="card mt-3 mb-4">
                 <div class="card-header">Paper Size</div>
                 <div class="card-body custom-control custom-radio">
-                    <span class="p-4">
-                        <input type="radio" class="m-2" name="paper_size" value="a4-portrait" checked>A4 Portrait
-                        <input type="radio" class="m-2" name="paper_size" value="a5-portrait">A5 Portrait
-                        <input type="radio" class="m-2" name="paper_size" value="a5-landscape">A5 Landscape
-                    </span>
+                    <div class="p-2">
+                        <input type="radio" class="m-2" name="paper_size" value="a4-portrait" onclick="onFixedSizeClicked()" checked>A4 Portrait
+                        <input type="radio" class="m-2" name="paper_size" value="a5-portrait" onclick="onFixedSizeClicked()">A5 Portrait
+                        <input type="radio" class="m-2" name="paper_size" value="a5-landscape" onclick="onFixedSizeClicked()">A5 Landscape
+                        <br>
+                        <input type="radio" class="m-2" name="paper_size" value="custom-size" onclick="onCustomSizeClicked()">Custom size
+                        <input type="text" class="m-2" id="custom-width" disabled>
+                        &times;
+                        <input type="text" class="m-2" id="custom-height" disabled>
+                        mm
+                    </div>
                 </div>
             </div>
 
