@@ -183,6 +183,13 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     # Add the '-p' option to display the progress
     cmd += ['-p']
 
+    # Increase the buffer size from the default 32KB to a much larger value
+    # - Without this, the scanner stops scanning at about page 4 or so
+    #   (resolution set to 300)
+    # - This was not necessary when executing scanimage from terminal,
+    #   but somehow if it is when the command is invoked in Python.
+    cmd += ['--buffer-size=1024']
+
     # Page width and height (unit: mm)
     w, h = 215, 297 # Unsupported paper size will fall back on A4 portrait
     if paper_size == 'a4-portrait':
