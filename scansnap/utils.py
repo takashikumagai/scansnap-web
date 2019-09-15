@@ -123,7 +123,11 @@ def scan_and_convert_process_main_loop(
 
             convert_process = convert_images_to_pdf(output_dir, output_pdf_pathname)
             t = threading.Thread(target=convert_process_main_loop,
-                kwargs={'process': convert_process, 'output_pdf_pathname': output_pdf_pathname, 'download_pdf_url': download_pdf_url})
+                kwargs={
+                    'process': convert_process,
+                    'output_pdf_pathname': output_pdf_pathname,
+                    'download_pdf_url': download_pdf_url
+                    })
             t.start()
     else:
         logging.info('scan_result!=success')
