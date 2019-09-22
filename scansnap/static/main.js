@@ -95,7 +95,8 @@ function startScan() {
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
         resolution: getSelectedRadioButtonValue('resolution'),
-        output_format: getSelectedRadioButtonValue('output_format')
+        output_format: getSelectedRadioButtonValue('output_format'),
+        rotate_page_90_degrees: document.querySelector('#rotate-page-90-degrees').checked
     };
     (async () => {
         const rawResponse = await fetch('/scan', {

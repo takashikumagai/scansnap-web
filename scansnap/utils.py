@@ -5,6 +5,7 @@ import threading
 import re
 import secrets
 import zipfile
+from PIL import Image
 
 class Settings:
 
@@ -66,6 +67,29 @@ def parse_stderr_and_send_events(stderr_lines):
 
     return scan_complete
 
+def rotate_image_and_save(image_path,degrees_to_rotate):
+    rotated = None
+    with Image.open(image_path) as img:
+        rotated = img.rotate(degrees_to_rotate, expand=1)
+    rotated.save(image_path)
+
+def rotate_scanned_images(output_dir, rotate):
+    if 0 < len(rotate):
+        image_files = subprocess.check_output(
+            ['ls {}'.format(os.path.join(output_dir,'*.jpg'))], shell=True)
+        image_files_list = image_files.decode('utf-8').split()
+        if rotate == '90':
+            for img_file_name in image_files_list:
+                img_path = os.path.join(output_dir,img_file_name)
+                rotate_image_and_save(img_path,90)
+        elif rotate == '90,270':
+            side = 1
+            for img_file_name in image_files_list:
+                img_path = os.path.join(output_dir,img_file_name)
+                deg = 90 if side == 1 else 270
+                rotate_image_and_save(img_path,deg)
+                side = side * (-1)
+
 # 1. Reads the stdout of the scanimage command and reports the status
 #    to the event listener, e.g. the scanner finished scanning i-th page
 # 2. If the scan is a success, starts converting the scanned image files into a PDF file.
@@ -74,6 +98,7 @@ def scan_and_convert_process_main_loop(
     output_dir,
     output_dir_url,
     output_pdf_filename,
+    rotate,
     save_images_as_zip
     ):
 
@@ -101,6 +126,8 @@ def scan_and_convert_process_main_loop(
     #event_listener.on_progress_updated('scan process terminated')
     if scan_result == 'success':
         logging.info('Document scan complete')
+
+        rotate_scanned_images(output_dir, rotate)
 
         if save_images_as_zip:
             event_listener.on_state_changed({'state': 'compressing', 'message': 'Compressing image files...'})
@@ -252,11 +279,25 @@ def scan_and_save_results(
     resolution=200,
     sides='front',
     color_mode='color',
+    rotate_page_90_degrees=False,
     output_dir='.',
     output_dir_url='',
     output_pdf_filename='out.pdf',
     save_images_as_zip=False
     ):
+
+    rotate = ''
+    if rotate_page_90_degrees:
+        if sides == 'front':
+            rotate = '90'
+        elif sides == 'duplex':
+            # Need to alternate the direction of the rotation,
+            # assuming that the top of the page is aligned to the same
+            # edge on both front and back.
+            rotate = '90,270'
+        else:
+            logging.error('Unsupported sides value: {}'.format(sides))
+            return
 
     # This executes the scanimage command and returns without
     # waiting for the command to finish
@@ -277,6 +318,7 @@ def scan_and_save_results(
             'output_dir': output_dir,
             'output_dir_url': output_dir_url,
             'output_pdf_filename': output_pdf_filename,
+            'rotate': rotate,
             'save_images_as_zip': save_images_as_zip
             })
 
