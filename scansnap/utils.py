@@ -229,6 +229,8 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
         w, h = 150, 215
     elif paper_size == 'a5-landscape':
         w, h = 215, 150
+    elif paper_size == 'letter':
+        w, h = 221, 284
     elif paper_size.find('custom') == 0:
         logging.info('Custom paper size info: {}'.format(paper_size))
         # Unpack paper_size (example: 'custom,125,80').
