@@ -77,6 +77,13 @@ function onCustomSizeClicked() {
     document.querySelector('#custom-height').disabled = false;
 }
 
+function onRotateOptionClicked() {
+    const borderOpacity
+    = document.querySelector("#rotate-page-90-degrees").checked ? 0.9 : 0.0;
+    console.log('opacity: ',borderOpacity);
+    document.querySelector("#rotate-option-container").style.borderColor
+    = `rgba(255, 20, 20, ${borderOpacity})`;
+}
 // Encodes the custom paper size in the form of a comma-separated string
 // Example: 'custom,100,200'
 function encodeCustomPaperSize() {
