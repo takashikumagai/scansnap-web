@@ -19,6 +19,11 @@
                         &times;
                         <input type="text" class="m-2" id="custom-height" disabled>
                         mm
+                        <div class="collapsible more-paper-size-options">More paper sizes</div>
+                        <div class="more-paper-sizes">
+                            <input type="radio" class="m-2" name="paper_size" value="b5-portrait" onclick="onFixedSizeClicked()">B5 Portrait
+                        </div>
+
                         <!-- Show red frame around the option to caution the user -->
                         <div id="rotate-option-container">
                             <input type="checkbox" id="rotate-page-90-degrees" onclick="onRotateOptionClicked()">
