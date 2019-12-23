@@ -233,6 +233,10 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
         w, h = 221, 284
     elif paper_size == 'b5-portrait':
         w, h = 185, 260
+    elif paper_size == 'jp-postcard-2-fold':
+        w, h = 153, 205
+    elif paper_size == 'jp-postcard-3-fold':
+        w, h = 153, 308
     elif paper_size.find('custom') == 0:
         logging.info('Custom paper size info: {}'.format(paper_size))
         # Unpack paper_size (example: 'custom,125,80').

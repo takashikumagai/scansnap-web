@@ -70,6 +70,16 @@ function getSelectedRadioButtonValue(radioButtonName) {
 function onFixedSizeClicked() {
     document.querySelector('#custom-width').disabled = true;
     document.querySelector('#custom-height').disabled = true;
+
+    let size = getSelectedRadioButtonValue('paper_size');
+    if( size == 'jp-postcard-2-fold'
+     || size == 'jp-postcard-3-fold' ) {
+         document.querySelector("#rotate-page-90-degrees").checked = true;
+         onRotateOptionClicked();
+    } else {
+         document.querySelector("#rotate-page-90-degrees").checked = false;
+         onRotateOptionClicked();
+    }
 }
 
 function onCustomSizeClicked() {
