@@ -69,9 +69,17 @@ def parse_stderr_and_send_events(stderr_lines):
 
 def rotate_image_and_save(image_path,degrees_to_rotate):
     rotated = None
+    rotated_image_path = ''
     with Image.open(image_path) as img:
         rotated = img.rotate(degrees_to_rotate, expand=1)
-    rotated.save(image_path)
+        rotated_image_path = image_path + '-rotated.jpg'
+        rotated.save(rotated_image_path)
+
+    subprocess.check_output(['mv', '-f', rotated_image_path, image_path])
+
+    # Just doing this outside the context manager worked on laptop (Ubuntu 16.04)
+    # But does not work on the Linux box (Buster)
+    #rotated.save(image_path)
 
 def rotate_scanned_images(output_dir, rotate):
     if 0 < len(rotate):
