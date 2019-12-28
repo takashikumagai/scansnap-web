@@ -76,7 +76,7 @@ def scan():
         resolution = content['resolution'],
         color_mode = content['color'],
         sides = content['sides'],
-        rotate_page_90_degrees = content['rotate_page_90_degrees'],
+        page_rotate_options = content['page_rotate_options'],
 
         # Working directory for this package > set to '(path to the package dir)/scansnap/' for scripts of the package?
         output_dir=output_dir,

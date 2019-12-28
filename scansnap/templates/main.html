@@ -6,7 +6,7 @@
     <fieldset class="form-group">
         <div class="container">
             <div class="card mt-3 mb-4">
-                <div class="card-header">Paper Size</div>
+                <div class="card-header">Paper Size and Orientation</div>
                 <div class="card-body custom-control custom-radio">
                     <div class="p-2">
                         <input type="radio" class="m-2" name="paper_size" value="a4-portrait" onclick="onFixedSizeClicked()" checked>A4 Portrait
@@ -30,6 +30,10 @@
                         <div id="rotate-option-container">
                             <input type="checkbox" id="rotate-page-90-degrees" onclick="onRotateOptionClicked()">
                             Turn the scanned pages by 90 degrees to output as landscape
+                        </div>
+                        <div id="even-numbered-page-rotation-option-container">
+                            <input type="checkbox" id="rotate-even-numbered-pages-180-degrees" onclick="onRotateOptionClicked()">
+                            Turn the even-numbered pages by 180 degrees
                         </div>
                     </div>
                 </div>

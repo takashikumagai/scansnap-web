@@ -107,13 +107,20 @@ function startScan() {
     const paperSizeValue = getSelectedRadioButtonValue('paper_size');
     const paperSize = (paperSizeValue == 'custom-size') ?
     encodeCustomPaperSize() : paperSizeValue;
+    let rotate_options = '';
+    if(document.querySelector('#rotate-page-90-degrees').checked) {
+        rotate_options += 'rotate_by_90_degrees';
+    }
+    if(document.querySelector('#rotate-even-numbered-pages-180-degrees').checked) {
+        rotate_options += (0 < rotate_options.length ? ',' : '') + 'rotate_even_numbered_page_by_180_degrees';
+    }
     let scanParams = {
         paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
         resolution: getSelectedRadioButtonValue('resolution'),
         output_format: getSelectedRadioButtonValue('output_format'),
-        rotate_page_90_degrees: document.querySelector('#rotate-page-90-degrees').checked
+        page_rotate_options: rotate_options
     };
     (async () => {
         const rawResponse = await fetch('/scan', {

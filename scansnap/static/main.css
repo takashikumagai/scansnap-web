@@ -3,6 +3,11 @@
     border: 2px solid rgba(255, 60, 60, .0);
     display: inline-block;
 }
+#even-numbered-page-rotation-option-container {
+    padding: 4px;
+    border: 2px solid rgba(255, 60, 60, .0);
+    /*display: inline-block;*/
+}
 
 /* Style the button that is used to open and close the collapsible content */
 .more-paper-size-options {

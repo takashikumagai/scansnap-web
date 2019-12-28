@@ -71,9 +71,10 @@ def rotate_image_and_save(image_path,degrees_to_rotate):
     rotated = None
     rotated_image_path = ''
     with Image.open(image_path) as img:
+        src_img_dpi = img.info['dpi']
         rotated = img.rotate(degrees_to_rotate, expand=1)
         rotated_image_path = image_path + '-rotated.jpg'
-        rotated.save(rotated_image_path)
+        rotated.save(rotated_image_path, dpi=src_img_dpi)
 
     subprocess.check_output(['mv', '-f', rotated_image_path, image_path])
 
@@ -90,6 +91,13 @@ def rotate_scanned_images(output_dir, rotate):
             for img_file_name in image_files_list:
                 img_path = os.path.join(output_dir,img_file_name)
                 rotate_image_and_save(img_path,90)
+        elif rotate == '0,180':
+            logging.info('Rotating even-numbered pages by 180 degrees')
+            # Rotate even-numbered pages
+            # Used to scan booklet stapled at the top
+            for img_file_name in image_files_list[1::2]:
+                img_path = os.path.join(output_dir,img_file_name)
+                rotate_image_and_save(img_path,180)
         elif rotate == '90,270':
             side = 1
             for img_file_name in image_files_list:
@@ -295,25 +303,35 @@ def scan_and_save_results(
     resolution=200,
     sides='front',
     color_mode='color',
-    rotate_page_90_degrees=False,
+    page_rotate_options='',
     output_dir='.',
     output_dir_url='',
     output_pdf_filename='out.pdf',
     save_images_as_zip=False
     ):
 
+    logging.info(f'page_rotate_options: {page_rotate_options}')
+
     rotate = ''
-    if rotate_page_90_degrees:
-        if sides == 'front':
-            rotate = '90'
-        elif sides == 'duplex':
-            # Need to alternate the direction of the rotation,
-            # assuming that the top of the page is aligned to the same
-            # edge on both front and back.
-            rotate = '90,270'
+    #if rotate_page_90_degrees:
+    if 0 <= page_rotate_options.find('rotate_by_90_degrees'):
+        if 0 <= page_rotate_options.find('rotate_even_numbered_page_by_180_degrees'):
+            logging.error('Rotate 90 + upside down correction: not supported yet.')
+            pass
         else:
-            logging.error('Unsupported sides value: {}'.format(sides))
-            return
+            if sides == 'front':
+                rotate = '90'
+            elif sides == 'duplex':
+                # Need to alternate the direction of the rotation,
+                # assuming that the top of the page is aligned to the same
+                # edge on both front and back.
+                rotate = '90,270'
+            else:
+                logging.error('Unsupported sides value: {}'.format(sides))
+                return
+    else:
+        if 0 <= page_rotate_options.find('rotate_even_numbered_page_by_180_degrees'):
+            rotate = '0,180'
 
     # This executes the scanimage command and returns without
     # waiting for the command to finish
