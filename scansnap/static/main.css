@@ -32,6 +32,10 @@
     overflow: hidden;
 }
 
+#brightness-slider {
+    width: 75%;
+}
+
 #download-form {
     visibility: hidden;
 }

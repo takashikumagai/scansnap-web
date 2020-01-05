@@ -40,6 +40,7 @@ def app_home():
             paper_size=form.paper_size.data,
             resolution=form.resolution.data,
             color_mode=form.color.data,
+            brightness='25',
             sides=form.sides.data,
 
             # Working directory for this package > set to '(path to the package dir)/scansnap/' for scripts of the package?
@@ -75,6 +76,7 @@ def scan():
         paper_size = content['paper_size'],
         resolution = content['resolution'],
         color_mode = content['color'],
+        brightness = content['brightness'],
         sides = content['sides'],
         page_rotate_options = content['page_rotate_options'],
 

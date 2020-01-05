@@ -60,6 +60,17 @@
             </div>
 
             <div class="card mb-4">
+                <div class="card-header">Brightness</div>
+                <div class="card-body">
+                    <span class="p-4">
+                        <span id="brightness-value" class="mr-4">0</span>
+                        <input type="range" class="custom-range" id="brightness-slider" name="brightness" min="-100" max="100" oninput="updateBrightnessSlider(this.value)">
+                    </span>
+                    <button class="btn btn-primary" type="button" id="brightness-slider-reset-button" onclick="resetBrightness()">Reset to default</button>
+                </div>
+            </div>
+
+            <div class="card mb-4">
                 <div class="card-header">Resolution</div>
                 <div class="card-body custom-control custom-radio">
                     <span class="p-4">

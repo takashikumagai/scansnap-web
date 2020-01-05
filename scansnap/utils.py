@@ -216,6 +216,7 @@ def convert_images_to_pdf(image_files_dir, output_pdf_pathname):
 # - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
 # - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
 def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_mode='color',
+                brightness=25,
                 output_dir='.', 
                 output_pdf_filename='out.pdf',
                 save_images_as_zip=False):
@@ -285,6 +286,9 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
     cmd += ['--source', source]
 
+    # Brightness
+    cmd += ['--brightness', str(brightness)]
+
     if Settings.sudo_scanimage:
         cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
@@ -303,6 +307,7 @@ def scan_and_save_results(
     resolution=200,
     sides='front',
     color_mode='color',
+    brightness=25,
     page_rotate_options='',
     output_dir='.',
     output_dir_url='',
@@ -340,6 +345,7 @@ def scan_and_save_results(
         resolution=resolution,
         sides=sides,
         color_mode=color_mode,
+        brightness=brightness,
         output_dir=output_dir,
         output_pdf_filename=output_pdf_filename,
         save_images_as_zip=False

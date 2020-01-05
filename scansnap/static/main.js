@@ -94,6 +94,19 @@ function onRotateOptionClicked() {
     document.querySelector("#rotate-option-container").style.borderColor
     = `rgba(255, 20, 20, ${borderOpacity})`;
 }
+
+function updateBrightnessSlider(value) {
+    document.querySelector('#brightness-value').innerHTML = value;
+}
+
+function resetBrightness() {
+    // TODO: define the default brightness for each scanner model
+    const defaultBrightness = 25;
+
+    document.querySelector("#brightness-slider").value = defaultBrightness;
+    document.querySelector("#brightness-value").innerHTML = defaultBrightness;
+}
+
 // Encodes the custom paper size in the form of a comma-separated string
 // Example: 'custom,100,200'
 function encodeCustomPaperSize() {
@@ -118,6 +131,7 @@ function startScan() {
         paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
+        brightness: document.querySelector('#brightness-slider').value,
         resolution: getSelectedRadioButtonValue('resolution'),
         output_format: getSelectedRadioButtonValue('output_format'),
         page_rotate_options: rotate_options
@@ -161,3 +175,5 @@ for(let i = 0; i < coll.length; i++) {
     }
   });
 }
+
+resetBrightness();
