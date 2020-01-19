@@ -52,6 +52,12 @@
     visibility: hidden;
 }
 
+#download-file-desc {
+    color: gray;
+    font-size: 14px;
+    margin: 5px;
+}
+
 .r {
     color: rgb(255, 75, 75);
 }

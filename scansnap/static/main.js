@@ -12,6 +12,15 @@ function formatBytes(bytes,decimals) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
  }
 
+function getOutputFormatDesc(outputFormat) {
+    switch(outputFormat) {
+        case 'pdf': return 'PDF';
+        case 'jpeg': return 'JPEG images (a .zip download)';
+        case 'pdf_and_jpeg': return 'PDF file + JPEG images (a .zip download)';
+        default: return 'Unknown format';
+    }
+ }
+
 // Creating a websocket automatically attempts to open the connection
 // to the server
 webSocket = new WebSocket(url);
@@ -33,13 +42,18 @@ webSocket.onmessage = function(event) {
                 break;
             case 'converting':
                 break;
-            case 'conversion_complete':
+            case 'creating_zip':
+                break;
+            case 'zip_created':
+                break;
+            case 'download_ready':
                 console.log('Showing the download button');
                 document.querySelector('#download-form').style.visibility = "visible";
-                console.log('msg.download_pdf_url:',msg.download_pdf_url)
-                document.querySelector('#download-form').action = msg.download_pdf_url;
-                const size = formatBytes(msg.pdf_file_size, 1);
-                document.querySelector('#download-button').textContent = `Download PDF (${size})`
+                console.log('msg.download_file_url:',msg.download_file_url)
+                document.querySelector('#download-form').action = msg.download_file_url;
+                const size = formatBytes(msg.download_file_size, 1);
+                const outputFormat = getOutputFormatDesc(msg.output_format);
+                document.querySelector('#download-file-desc').textContent = `${outputFormat}, ${size}`
                 break;
             default:
                 break;
