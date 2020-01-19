@@ -289,7 +289,7 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     # Brightness
     cmd += ['--brightness', str(brightness)]
 
-    if Settings.sudo_scanimage:
+    if Settings.sudo_scanimage and not Settings.test_mode:
         cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
     logging.info('cmd: {}'.format(cmd))
@@ -369,7 +369,7 @@ def get_scanner_info_sync():
     try:
         cmd = ['scanimage', '-L']
 
-        if Settings.sudo_scanimage:
+        if Settings.sudo_scanimage and not Settings.test_mode:
             cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
         logging.info('scanner check cmd: {}'.format(cmd))
