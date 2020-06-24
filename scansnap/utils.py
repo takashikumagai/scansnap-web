@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import subprocess
@@ -33,11 +34,12 @@ def set_event_listener(listener):
     global event_listener
     event_listener = listener
 
-def save_scanned_images_as_zip_file(img_files_dir, zip_file_path):
+def save_scanned_images_as_zip_file(img_files_dir, zip_file_path, arc_dir):
     with zipfile.ZipFile(zip_file_path, 'w') as pages_zip:
         # There should only be *.jpg files in the output_dir at this moment
         for f in os.listdir(img_files_dir):
-            pages_zip.write(f)
+            if f.endswith('.jpg'):
+                pages_zip.write(filename=os.path.join(img_files_dir,f), arcname=f'{arc_dir}/{f}')
 
 def parse_stdout(stdout_lines):
     for line in stdout_lines:
@@ -113,9 +115,8 @@ def scan_and_convert_process_main_loop(
     process,
     output_dir,
     output_dir_url,
-    output_pdf_filename,
     rotate,
-    save_images_as_zip
+    output_format
     ):
 
     global event_listener
@@ -143,33 +144,71 @@ def scan_and_convert_process_main_loop(
     if scan_result == 'success':
         logging.info('Document scan complete')
 
+        output_filename_stem = 'scan_' + datetime.datetime.now().replace(microsecond=0).isoformat().replace(':','_')
+
         rotate_scanned_images(output_dir, rotate)
 
-        if save_images_as_zip:
-            event_listener.on_state_changed({'state': 'compressing', 'message': 'Compressing image files...'})
-            jpg_files_zip_pathname = os.path.join(output_dir,'pages_jpg.zip')
-            save_scanned_images_as_zip_file(output_dir, jpg_files_zip_pathname)
+        images_zip_filename = ''
+        images_zip_pathname = ''
+        arc_dir = output_filename_stem
+        if output_format == 'jpeg' or output_format == 'pdf_and_jpeg':
+            event_listener.on_state_changed({'state': 'creating_zip', 'message': 'Creating a zip from image files...'})
+            images_zip_filename = f'{output_filename_stem}_jpg.zip'
+            images_zip_pathname = os.path.join(output_dir, images_zip_filename)
+            save_scanned_images_as_zip_file(output_dir, images_zip_pathname, arc_dir)
+            event_listener.on_state_changed({'state': 'zip_created', 'message': 'Created a zip from image files.'})
+            if output_format == 'jpeg':
+                # No need to create a PDF file
+                download_file_size = get_file_size_in_bytes(images_zip_pathname)
+                event_listener.on_state_changed({
+                    'state': 'download_ready',
+                    'output_format': output_format,
+                    'pdf_file_url': '',
+                    'download_file_url': output_dir_url + '/' + images_zip_filename,
+                    'download_file_size': download_file_size,
+                    'num_scanned_pages': 0
+                })
 
-        if 0 < len(output_pdf_filename):
+        if output_format == 'pdf' or output_format == 'pdf_and_jpeg':
+            # Generate PDF from image files
             event_listener.on_state_changed({'state': 'converting', 'message': 'Converting image files into a PDF file...'})
 
-            # A pathname of the output PDF file
-            output_pdf_pathname = os.path.join(output_dir, output_pdf_filename)
-            logging.info('output_pdf_pathname: {}'.format(output_pdf_pathname))
+            # A pathname of the output file (pdf or zip)
+            ext = '.pdf' if output_format == 'pdf' else '.zip'
+            output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
+            logging.info('output_file_pathname: {}'.format(output_file_pathname))
 
             # output_dir starts with 'static' without the leading forward slash
             # Run the convert command asynchronously and monitor the stdout
 
-            download_pdf_url = output_dir_url + '/' + output_pdf_filename
-            logging.info('download_pdf_url: {}'.format(download_pdf_url))
-                
+            download_file_url = output_dir_url + '/' + output_filename_stem + ext
+            logging.info('download_file_url: {}'.format(download_file_url))
 
-            convert_process = convert_images_to_pdf(output_dir, output_pdf_pathname)
+            # PDF for review purpose (available whether the output format is
+            # pdf or combined zip file of pdf and image files)
+            pdf_file_pathname = os.path.join(output_dir, output_filename_stem + '.pdf')
+            pdf_filename = output_filename_stem + '.pdf'
+            pdf_file_url = output_dir_url + '/' + output_filename_stem + '.pdf'
+
+            convert_process = convert_images_to_pdf(output_dir, pdf_file_pathname)
             t = threading.Thread(target=convert_process_main_loop,
                 kwargs={
                     'process': convert_process,
-                    'output_pdf_pathname': output_pdf_pathname,
-                    'download_pdf_url': download_pdf_url
+                    'output_format': output_format,
+                    'output_dir': output_dir,
+                    'output_file_pathname': output_file_pathname,
+                    'arc_dir': arc_dir,
+
+                    # These 2 args are empty string if output_format == 'pdf'
+                    'images_zip_pathname': images_zip_pathname,
+                    'images_zip_filename': images_zip_filename,
+
+                    # PDF for preview; available in both output formats (pdf and pdf_and_jpeg)
+                    'pdf_file_pathname': pdf_file_pathname,
+                    'pdf_filename': pdf_filename,
+                    'pdf_file_url': pdf_file_url,
+
+                    'download_file_url': download_file_url
                     })
             t.start()
     else:
@@ -178,7 +217,20 @@ def scan_and_convert_process_main_loop(
 def get_file_size_in_bytes(pathname):
     return os.stat(pathname).st_size
 
-def convert_process_main_loop(process, output_pdf_pathname, download_pdf_url):
+def convert_process_main_loop(
+    process,
+    output_format,
+    output_dir,
+    output_file_pathname,
+    arc_dir, # Internal directory in the ZIP archive
+    images_zip_pathname,
+    images_zip_filename,
+    pdf_file_pathname,
+    pdf_filename,
+    pdf_file_url,
+    download_file_url,
+    ):
+
     while(True):
 
         rc = process.poll()
@@ -188,12 +240,31 @@ def convert_process_main_loop(process, output_pdf_pathname, download_pdf_url):
         else:
             logging.info('conversion returncode: {}'.format(rc))
             if rc == 0:
-                logging.info('download_pdf_url: {}'.format(download_pdf_url))
-                pdf_file_size = get_file_size_in_bytes(output_pdf_pathname)
+                if output_format == 'pdf':
+                    # Download file is a PDF file; no more conversions / compressions are
+                    # performed. Just return the link to the PDF file, i.e. output_file_pathname
+                    # (.pdf) already exists.
+                    pass
+                elif output_format == 'pdf_and_jpeg':
+                    # Zip the pdf file and the zip file of images to create
+                    # a single zip file for download
+                    with zipfile.ZipFile(output_file_pathname, 'w') as pdf_and_images_zip:
+                        #arc_dir = datetime.datetime.now().replace(microsecond=0).isoformat().replace(':','_')
+                        pdf_and_images_zip.write(pdf_file_pathname, f'{arc_dir}/{pdf_filename}')
+                        pdf_and_images_zip.write(images_zip_pathname, f'{arc_dir}/{images_zip_filename}')
+                else:
+                    logging.error('Unsupported output format')
+
+                logging.info('download_file_url: {}'.format(download_file_url))
+                download_file_size = get_file_size_in_bytes(output_file_pathname)
                 event_listener.on_state_changed({
-                    'state': 'conversion_complete', 
-                    'download_pdf_url': download_pdf_url,
-                    'pdf_file_size': pdf_file_size})
+                    'state': 'download_ready',
+                    'output_format': output_format,
+                    'pdf_file_url': pdf_file_url,
+                    'download_file_url': download_file_url,
+                    'download_file_size': download_file_size,
+                    'num_scanned_pages': 0
+                })
 
                 #create_zip_of_scanned_pages()
 
@@ -216,9 +287,8 @@ def convert_images_to_pdf(image_files_dir, output_pdf_pathname):
 # - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
 # - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
 def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_mode='color',
-                output_dir='.', 
-                output_pdf_filename='out.pdf',
-                save_images_as_zip=False):
+                brightness=25,
+                output_dir='.'):
 
     cmd = []
 
@@ -285,7 +355,10 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
     cmd += ['--source', source]
 
-    if Settings.sudo_scanimage:
+    # Brightness
+    cmd += ['--brightness', str(brightness)]
+
+    if Settings.sudo_scanimage and not Settings.test_mode:
         cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
     logging.info('cmd: {}'.format(cmd))
@@ -303,11 +376,11 @@ def scan_and_save_results(
     resolution=200,
     sides='front',
     color_mode='color',
+    brightness=25,
     page_rotate_options='',
     output_dir='.',
     output_dir_url='',
-    output_pdf_filename='out.pdf',
-    save_images_as_zip=False
+    output_format='pdf'
     ):
 
     logging.info(f'page_rotate_options: {page_rotate_options}')
@@ -340,9 +413,8 @@ def scan_and_save_results(
         resolution=resolution,
         sides=sides,
         color_mode=color_mode,
-        output_dir=output_dir,
-        output_pdf_filename=output_pdf_filename,
-        save_images_as_zip=False
+        brightness=brightness,
+        output_dir=output_dir
         )
 
     t = threading.Thread(
@@ -351,9 +423,8 @@ def scan_and_save_results(
             'process': p,
             'output_dir': output_dir,
             'output_dir_url': output_dir_url,
-            'output_pdf_filename': output_pdf_filename,
             'rotate': rotate,
-            'save_images_as_zip': save_images_as_zip
+            'output_format': output_format
             })
 
     t.start()
@@ -363,7 +434,7 @@ def get_scanner_info_sync():
     try:
         cmd = ['scanimage', '-L']
 
-        if Settings.sudo_scanimage:
+        if Settings.sudo_scanimage and not Settings.test_mode:
             cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
         logging.info('scanner check cmd: {}'.format(cmd))

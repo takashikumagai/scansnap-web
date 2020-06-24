@@ -3,16 +3,20 @@
 An application to control Fujitsu's ScanSnap devices from browsers.
 
 ## Background
-ScanSnap iX500 by Fujitsu is a compact and handy home scanner. Fujitsu provides drivers for Windows and Linux, but GUI is only available on Windows. This app will provide a Web-based UI to control a ScanSnap scanner connected via USB to a Linux PC running as a server. For the moment, the app is mainly intended to be used on a small local network and is geared toward family or a share house.
+ScanSnap iX500 by Fujitsu is a compact and handy home scanner. Fujitsu provides drivers for Windows and Linux, but GUI is only available on Windows. This application provides a Web-based GUI to control a ScanSnap scanner over the network (within the same subnet) and is designed to run on a small form factor Linux PC*. For the moment, the application is mainly intended to be used on a small local network and is geared toward family or a share house.
+
+\*These PCs are often colloquially called 'mini PCs' or 'Linux box'.
 
 ## Requirements:
-- A Linux PC to host this webapp (tested with Ubuntu 18.04 LTS)
-  - Has to be an x86 PC. Fujitsu's driver does not support ARM (I tried it with my Raspberry Pi but it did not work).
+### Server
+- An i386/amd64 PC running Linux (tested with Ubuntu 18.04 LTS and Debian 10)
+- The following packages need to be installed on a PC that satisfies the requirement above:
   - Official ScanSnap driver from Fujitsu's website
-    - https://www.fujitsu.com/global/support/products/computing/peripheral/scanners/sp/software/ubuntu.html
-  - ImageMagick (for generating PDF files from jpage images)
-    ```
-    sudo apt install imagemagick
-    ```
+  - ImageMagick (for generating PDF files from jpeg images)
   - Python 3.6 or higher
-- A device that runs a modern browser, e.g. a smartphone, tablet, or PC
+
+### Client
+- A device with a display, e.g. a smartphone, tablet, or laptop, with a modern web browser
+
+## Tips
+- Note that Fujitsu provides Linux drivers for computers with **i386** and **amd64 (x86_64)** architectures, but **NOT for ARM architecture machines** (last confirmed in early 2019). As such, this application does not run on Raspberry Pi devices (I confirmed it with a Pi 3 and indeed it did not work).

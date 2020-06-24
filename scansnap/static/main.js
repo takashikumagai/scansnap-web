@@ -12,6 +12,15 @@ function formatBytes(bytes,decimals) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
  }
 
+function getOutputFormatDesc(outputFormat) {
+    switch(outputFormat) {
+        case 'pdf': return 'PDF';
+        case 'jpeg': return 'JPEG images (a .zip download)';
+        case 'pdf_and_jpeg': return 'PDF file + JPEG images (a .zip download)';
+        default: return 'Unknown format';
+    }
+ }
+
 // Creating a websocket automatically attempts to open the connection
 // to the server
 webSocket = new WebSocket(url);
@@ -33,13 +42,18 @@ webSocket.onmessage = function(event) {
                 break;
             case 'converting':
                 break;
-            case 'conversion_complete':
+            case 'creating_zip':
+                break;
+            case 'zip_created':
+                break;
+            case 'download_ready':
                 console.log('Showing the download button');
                 document.querySelector('#download-form').style.visibility = "visible";
-                console.log('msg.download_pdf_url:',msg.download_pdf_url)
-                document.querySelector('#download-form').action = msg.download_pdf_url;
-                const size = formatBytes(msg.pdf_file_size, 1);
-                document.querySelector('#download-button').textContent = `Download PDF (${size})`
+                console.log('msg.download_file_url:',msg.download_file_url)
+                document.querySelector('#download-form').action = msg.download_file_url;
+                const size = formatBytes(msg.download_file_size, 1);
+                const outputFormat = getOutputFormatDesc(msg.output_format);
+                document.querySelector('#download-file-desc').textContent = `${outputFormat}, ${size}`
                 break;
             default:
                 break;
@@ -94,6 +108,19 @@ function onRotateOptionClicked() {
     document.querySelector("#rotate-option-container").style.borderColor
     = `rgba(255, 20, 20, ${borderOpacity})`;
 }
+
+function updateBrightnessSlider(value) {
+    document.querySelector('#brightness-value').innerHTML = value;
+}
+
+function resetBrightness() {
+    // TODO: define the default brightness for each scanner model
+    const defaultBrightness = 25;
+
+    document.querySelector("#brightness-slider").value = defaultBrightness;
+    document.querySelector("#brightness-value").innerHTML = defaultBrightness;
+}
+
 // Encodes the custom paper size in the form of a comma-separated string
 // Example: 'custom,100,200'
 function encodeCustomPaperSize() {
@@ -118,6 +145,7 @@ function startScan() {
         paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
+        brightness: document.querySelector('#brightness-slider').value,
         resolution: getSelectedRadioButtonValue('resolution'),
         output_format: getSelectedRadioButtonValue('output_format'),
         page_rotate_options: rotate_options
@@ -161,3 +189,5 @@ for(let i = 0; i < coll.length; i++) {
     }
   });
 }
+
+resetBrightness();

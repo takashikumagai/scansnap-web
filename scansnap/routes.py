@@ -40,13 +40,13 @@ def app_home():
             paper_size=form.paper_size.data,
             resolution=form.resolution.data,
             color_mode=form.color.data,
+            brightness='25',
             sides=form.sides.data,
 
             # Working directory for this package > set to '(path to the package dir)/scansnap/' for scripts of the package?
             output_dir=output_dir,
             output_dir_url=output_dir_url,
-            output_pdf_filename='scan.pdf',
-            save_images_as_zip = False
+            output_format='pdf'
         )
 
     return render_template('home.html', form=form)
@@ -75,14 +75,14 @@ def scan():
         paper_size = content['paper_size'],
         resolution = content['resolution'],
         color_mode = content['color'],
+        brightness = content['brightness'],
         sides = content['sides'],
         page_rotate_options = content['page_rotate_options'],
 
         # Working directory for this package > set to '(path to the package dir)/scansnap/' for scripts of the package?
         output_dir=output_dir,
         output_dir_url=output_dir_url,
-        output_pdf_filename='scan.pdf',
-        save_images_as_zip = False
+        output_format = content['output_format']
     )
 
     return jsonify({'scan': 'started'})
