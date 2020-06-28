@@ -48,7 +48,9 @@ def parse_stdout(stdout_lines):
 
 def parse_stderr_and_send_events(stderr_lines):
     global event_listener
-    scan_complete = False
+    #scan_complete = False
+    scan_state = 'scanning'
+    progress_report_count = 0
     for line in stderr_lines:
         logging.info('scan stderr: {}'.format(line))
 
@@ -62,12 +64,24 @@ def parse_stderr_and_send_events(stderr_lines):
             scanned_pages = m.group(0)
             event_listener.on_progress_updated({'last_scanned_page': scanned_pages})
             event_listener.on_state_changed({'state': 'scan_complete', 'message': 'Scan complete'})
-            scan_complete = True
+            #scan_complete = True
+            scan_state = 'scan_complete'
+        elif re.match('Document feeder jammed', line):
+            logging.info('Feeder jammed')
+            event_listener.on_state_changed({'state': 'document_feeder_jammed', 'message': 'Document feeder jammed'})
+            #scan_complete = False
+            scan_state = 'feeder_jammed'
+            break
+        elif re.match('^Progress: ', line):
+            progress_report_count += 1
+            pass
         else:
-            logging.info('Some other stderr info')
-            logging.info(line)
+            pass
+            #logging.info('Some other stderr info')
 
-    return scan_complete
+    logging.info('progress_report_count: {}'.format(progress_report_count))
+    #return scan_complete
+    return scan_state
 
 def rotate_image_and_save(image_path,degrees_to_rotate):
     rotated = None
@@ -108,6 +122,11 @@ def rotate_scanned_images(output_dir, rotate):
                 rotate_image_and_save(img_path,deg)
                 side = side * (-1)
 
+def get_num_scanned_pages_before_jamming(output_dir):
+    jpg_files = [f for f in os.listdir(outdir) if re.match(r'.+\.jpg$', f)]
+    num_jpg_files = len(jpg_files)
+    print(f'{num_jpg_files} JPG files have been created.')
+
 # 1. Reads the stdout of the scanimage command and reports the status
 #    to the event listener, e.g. the scanner finished scanning i-th page
 # 2. If the scan is a success, starts converting the scanned image files into a PDF file.
@@ -115,11 +134,13 @@ def scan_and_convert_process_main_loop(
     process,
     output_dir,
     output_dir_url,
+    output_page_option,
     rotate,
     output_format
     ):
 
     global event_listener
+    print('scan_and_convert_process_main_loop')
 
     scan_result = ''
     while(True):
@@ -127,9 +148,9 @@ def scan_and_convert_process_main_loop(
         parse_stdout(process.stdout)
 
         # stderr
-        scan_complete = parse_stderr_and_send_events(process.stderr)
-        if scan_complete:
-            scan_result = 'success'
+        scan_state = parse_stderr_and_send_events(process.stderr)
+        #if scan_state == 'scan_complete':
+        #    scan_result = 'success'
 
         logging.info('Polling')
         rc = process.poll()
@@ -140,57 +161,103 @@ def scan_and_convert_process_main_loop(
             process.stdout.close()
             break
 
+    on_scan_process_terminated(
+        scan_state,
+        output_dir,
+        output_dir_url,
+        output_page_option,
+        rotate,
+        output_format
+    )
+
+def on_scan_process_terminated(
+    scan_state,
+    output_dir,
+    output_dir_url,
+    output_page_option,
+    rotate,
+    output_format
+    ):
+
     #event_listener.on_progress_updated('scan process terminated')
-    if scan_result == 'success':
-        logging.info('Document scan complete')
+    #if scan_result == 'success':
+    if scan_state == 'scan_complete':
+        on_scan_complete(
+            output_dir,
+            output_dir_url,
+            output_page_option,
+            rotate,
+            output_format
+        )
+    elif scan_stage == 'feeder_jammed':
+        logging.info('Unfortunately, the feeder has jammed.')
+        num_scanned_pages = get_num_scanned_pages_before_jamming(output_dir)
+    else:
+        logging.info('scan_state!=success')
 
-        output_filename_stem = 'scan_' + datetime.datetime.now().replace(microsecond=0).isoformat().replace(':','_')
+def on_scan_complete(
+    output_dir,
+    output_dir_url,
+    output_page_option,
+    rotate,
+    output_format
+    ):
 
-        rotate_scanned_images(output_dir, rotate)
+    logging.info('Document scan complete')
 
-        images_zip_filename = ''
-        images_zip_pathname = ''
-        arc_dir = output_filename_stem
-        if output_format == 'jpeg' or output_format == 'pdf_and_jpeg':
-            event_listener.on_state_changed({'state': 'creating_zip', 'message': 'Creating a zip from image files...'})
-            images_zip_filename = f'{output_filename_stem}_jpg.zip'
-            images_zip_pathname = os.path.join(output_dir, images_zip_filename)
-            save_scanned_images_as_zip_file(output_dir, images_zip_pathname, arc_dir)
-            event_listener.on_state_changed({'state': 'zip_created', 'message': 'Created a zip from image files.'})
-            if output_format == 'jpeg':
-                # No need to create a PDF file
-                download_file_size = get_file_size_in_bytes(images_zip_pathname)
-                event_listener.on_state_changed({
-                    'state': 'download_ready',
-                    'output_format': output_format,
-                    'pdf_file_url': '',
-                    'download_file_url': output_dir_url + '/' + images_zip_filename,
-                    'download_file_size': download_file_size,
-                    'num_scanned_pages': 0
-                })
+    output_filename_stem = 'scan_' + datetime.datetime.now().replace(microsecond=0).isoformat().replace(':','_')
 
-        if output_format == 'pdf' or output_format == 'pdf_and_jpeg':
-            # Generate PDF from image files
-            event_listener.on_state_changed({'state': 'converting', 'message': 'Converting image files into a PDF file...'})
+    rotate_scanned_images(output_dir, rotate)
 
-            # A pathname of the output file (pdf or zip)
-            ext = '.pdf' if output_format == 'pdf' else '.zip'
-            output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
-            logging.info('output_file_pathname: {}'.format(output_file_pathname))
+    images_zip_filename = ''
+    images_zip_pathname = ''
+    arc_dir = output_filename_stem
+    if output_format == 'jpeg' or output_format == 'pdf_and_jpeg':
+        # Zip the generated image files
+        event_listener.on_state_changed({'state': 'creating_zip', 'message': 'Creating a zip from image files...'})
+        images_zip_filename = f'{output_filename_stem}_jpg.zip'
+        images_zip_pathname = os.path.join(output_dir, images_zip_filename)
+        save_scanned_images_as_zip_file(output_dir, images_zip_pathname, arc_dir)
+        event_listener.on_state_changed({'state': 'zip_created', 'message': 'Created a zip from image files.'})
 
-            # output_dir starts with 'static' without the leading forward slash
-            # Run the convert command asynchronously and monitor the stdout
+        if output_format == 'jpeg':
+            # No need to create a PDF file
+            download_file_size = get_file_size_in_bytes(images_zip_pathname)
+            event_listener.on_state_changed({
+                'state': 'download_ready',
+                'output_format': output_format,
+                'pdf_file_url': '',
+                'download_file_url': output_dir_url + '/' + images_zip_filename,
+                'download_file_size': download_file_size,
+                'num_scanned_pages': 0
+            })
 
-            download_file_url = output_dir_url + '/' + output_filename_stem + ext
-            logging.info('download_file_url: {}'.format(download_file_url))
+    if output_format == 'pdf' or output_format == 'pdf_and_jpeg':
+        # Generate PDF from image files
+        event_listener.on_state_changed({'state': 'converting', 'message': 'Converting image files into a PDF file...'})
 
+        # A pathname of the output file (pdf or zip)
+        ext = '.pdf' if output_format == 'pdf' else '.zip'
+        output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
+        logging.info('output_file_pathname: {}'.format(output_file_pathname))
+
+        # output_dir starts with 'static' without the leading forward slash
+        # Run the convert command asynchronously and monitor the stdout
+
+        download_file_url = output_dir_url + '/' + output_filename_stem + ext
+        logging.info('download_file_url: {}'.format(download_file_url))
+
+        image_files_list = subprocess.check_output(
+            ['ls {}'.format(os.path.join(output_dir,'*.jpg'))],
+            shell=True).decode('utf-8').split()
+        if output_page_option == 'single-pdf-file':
             # PDF for review purpose (available whether the output format is
             # pdf or combined zip file of pdf and image files)
             pdf_file_pathname = os.path.join(output_dir, output_filename_stem + '.pdf')
             pdf_filename = output_filename_stem + '.pdf'
             pdf_file_url = output_dir_url + '/' + output_filename_stem + '.pdf'
 
-            convert_process = convert_images_to_pdf(output_dir, pdf_file_pathname)
+            convert_process = convert_images_to_pdf(image_files_list, pdf_file_pathname)
             t = threading.Thread(target=convert_process_main_loop,
                 kwargs={
                     'process': convert_process,
@@ -211,11 +278,67 @@ def scan_and_convert_process_main_loop(
                     'download_file_url': download_file_url
                     })
             t.start()
-    else:
-        logging.info('scan_result!=success')
+
+        elif output_page_option == 'pdf-for-each-scanned-page':
+            output_pdf_pathnames = []
+            for i, image_file in enumerate(image_files_list):
+                pdf_filename = f'{output_filename_stem}_{str(i+1).zfill(3)}.pdf'
+                pdf_file_pathname = os.path.join(output_dir, pdf_filename)
+                convert_process = convert_images_to_pdf([image_file], pdf_file_pathname)
+                while(True):
+                    rc = convert_process.poll()
+                    if rc is None:
+                        # rc is None: the process has NOT been terminated.
+                        pass
+                    else:
+                        # Process has been terminated
+                        logging.info(f'PDF file {i} rc: {rc}')
+                        if rc == 0:
+                            output_pdf_pathnames.append(pdf_file_pathname)
+
+                            # Don't do this; this would add each character of string
+                            # pdf_file_pathname as separate list elements
+                            # output_pdf_pathnames += pdf_file_pathname
+                            logging.info(f'PDF generated: {pdf_file_pathname}')
+                        else:
+                            logging.warn(f'{image_file} might not have been successfully converted to a PDF file')
+                        break
+
+            # If no errors occurred during the conversions, all image files
+            # have been converted to PDF files.
+            # Onto creating a zip file.
+            zip_filename = f'{output_filename_stem}.zip'
+            zipfile_path = os.path.join(output_dir, zip_filename)
+            logging.info(f'Zipping {len(output_pdf_pathnames)} PDF files')
+            logging.info(f'PDF pathnames: {output_pdf_pathnames}')
+            with zipfile.ZipFile(zipfile_path, 'w') as pages_zip:
+                for pdf_path in output_pdf_pathnames:
+                    pages_zip.write(pdf_path, f'{arc_dir}/{os.path.basename(pdf_path)}')
+                if output_format == 'pdf_and_jpeg':
+                    pages_zip.write(images_zip_pathname, f'{arc_dir}/{images_zip_filename}')
+
+            download_zipfile_size = get_file_size_in_bytes(zipfile_path)
+            event_listener.on_state_changed({
+                'state': 'download_ready',
+                'download_file_url': output_dir_url + '/' + zip_filename,
+                'download_file_size': download_zipfile_size})
+        elif output_page_option == 'pdf-for-each-2-scanned-pages':
+            logging.error('PDF file for each 2 scanned pages: not implemented')
+        else:
+            logging.error('Unrecognized output page option')
 
 def get_file_size_in_bytes(pathname):
     return os.stat(pathname).st_size
+
+def poll_prrocess(process, on_process_terminated):
+    while(True):
+        rc = process.poll()
+        if rc is None:
+            # rc is None: the process has NOT been terminated.
+            pass
+        else:
+            logging.info('returncode: {}'.format(rc))
+            on_process_terminated()
 
 def convert_process_main_loop(
     process,
@@ -272,10 +395,10 @@ def convert_process_main_loop(
             break # Process has been terminated
 
 # Executes the shell command to convert multiple jpg images into a single PDF file and returns (async)
-def convert_images_to_pdf(image_files_dir, output_pdf_pathname):
-    image_files_list = subprocess.check_output(['ls {}'.format(os.path.join(image_files_dir,'*.jpg'))], shell=True)
+# Note that this requires ImageMagick
+def convert_images_to_pdf(image_files_list, output_pdf_pathname):
     convert_cmd = ['convert']
-    convert_cmd += image_files_list.decode('utf-8').split()
+    convert_cmd += image_files_list
     convert_cmd += [output_pdf_pathname]
     logging.info('convert_cmd: {}'.format(convert_cmd))
     p = subprocess.Popen(convert_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -380,7 +503,8 @@ def scan_and_save_results(
     page_rotate_options='',
     output_dir='.',
     output_dir_url='',
-    output_format='pdf'
+    output_format='pdf',
+    output_page_option='single-pdf-file'
     ):
 
     logging.info(f'page_rotate_options: {page_rotate_options}')
@@ -423,6 +547,7 @@ def scan_and_save_results(
             'process': p,
             'output_dir': output_dir,
             'output_dir_url': output_dir_url,
+            'output_page_option': output_page_option,
             'rotate': rotate,
             'output_format': output_format
             })

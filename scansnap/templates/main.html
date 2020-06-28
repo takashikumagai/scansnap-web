@@ -84,9 +84,15 @@
             <div class="card mb-4">
                 <div class="card-header">Output Format</div>
                 <div class="card-body custom-control custom-radio">
-                    <input type="radio" class="m-2" name="output_format" value="pdf" checked>PDF
-                    <input type="radio" class="m-2" name="output_format" value="jpeg">JPEG file(s)
-                    <input type="radio" class="m-2" name="output_format" value="pdf_and_jpeg">PDF & JPEG
+                    <div>
+                        <input type="radio" class="m-2" name="output_format" value="pdf" checked>PDF
+                        <input type="radio" class="m-2" name="output_format" value="jpeg">JPEG file(s)
+                        <input type="radio" class="m-2" name="output_format" value="pdf_and_jpeg">PDF & JPEG
+                    </div>
+                    <div class="p-2 output-option-container">
+                        <input type="checkbox" id="each-page-into-separate-pdf">
+                        Save each page to a separate PDF file.
+                    </div>
                 </div>
             </div>
         </div>

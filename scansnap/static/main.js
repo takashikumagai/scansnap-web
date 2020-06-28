@@ -141,6 +141,10 @@ function startScan() {
     if(document.querySelector('#rotate-even-numbered-pages-180-degrees').checked) {
         rotate_options += (0 < rotate_options.length ? ',' : '') + 'rotate_even_numbered_page_by_180_degrees';
     }
+    const output_option
+    = document.querySelector('#each-page-into-separate-pdf').checked ?
+    'pdf-for-each-scanned-page' : 'single-pdf-file';
+
     let scanParams = {
         paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
@@ -148,6 +152,7 @@ function startScan() {
         brightness: document.querySelector('#brightness-slider').value,
         resolution: getSelectedRadioButtonValue('resolution'),
         output_format: getSelectedRadioButtonValue('output_format'),
+        output_page_option: output_option,
         page_rotate_options: rotate_options
     };
     (async () => {
