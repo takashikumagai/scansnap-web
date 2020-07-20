@@ -253,9 +253,9 @@ def on_scan_complete(
         if output_page_option == 'single-pdf-file':
             # PDF for review purpose (available whether the output format is
             # pdf or combined zip file of pdf and image files)
-            pdf_file_pathname = os.path.join(output_dir, output_filename_stem + '.pdf')
             pdf_filename = output_filename_stem + '.pdf'
-            pdf_file_url = output_dir_url + '/' + output_filename_stem + '.pdf'
+            pdf_file_pathname = os.path.join(output_dir, pdf_filename)
+            pdf_file_url = output_dir_url + '/' + pdf_filename
 
             convert_process = convert_images_to_pdf(image_files_list, pdf_file_pathname)
             t = threading.Thread(target=convert_process_main_loop,
