@@ -195,6 +195,111 @@ def on_scan_process_terminated(
     else:
         logging.info('scan_state!=success')
 
+def generate_pdf_from_image_files(
+    output_format,
+    output_dir,
+    output_dir_url,
+    output_page_option,
+    output_filename_stem,
+    images_zip_pathname):
+
+    # Generate PDF from image files
+    event_listener.on_state_changed({'state': 'converting', 'message': 'Converting image files into a PDF file...'})
+
+    # A pathname of the output file (pdf or zip)
+    ext = '.pdf' if output_format == 'pdf' else '.zip'
+    output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
+    logging.info('output_file_pathname: {}'.format(output_file_pathname))
+
+    # output_dir starts with 'static' without the leading forward slash
+    # Run the convert command asynchronously and monitor the stdout
+
+    download_file_url = output_dir_url + '/' + output_filename_stem + ext
+    logging.info('download_file_url: {}'.format(download_file_url))
+
+    image_files_list = subprocess.check_output(
+        ['ls {}'.format(os.path.join(output_dir,'*.jpg'))],
+        shell=True).decode('utf-8').split()
+    if output_page_option == 'single-pdf-file':
+        # PDF for review purpose (available whether the output format is
+        # pdf or combined zip file of pdf and image files)
+        pdf_filename = output_filename_stem + '.pdf'
+        pdf_file_pathname = os.path.join(output_dir, pdf_filename)
+        pdf_file_url = output_dir_url + '/' + pdf_filename
+
+        arc_dir = output_filename_stem
+        images_zip_filename = os.path.basename(images_zip_pathname)
+
+        convert_process = convert_images_to_pdf(image_files_list, pdf_file_pathname)
+        t = threading.Thread(target=convert_process_main_loop,
+            kwargs={
+                'process': convert_process,
+                'output_format': output_format,
+                'output_dir': output_dir,
+                'output_file_pathname': output_file_pathname,
+                'arc_dir': arc_dir,
+
+                # These 2 args are empty string if output_format == 'pdf'
+                'images_zip_pathname': images_zip_pathname,
+                'images_zip_filename': images_zip_filename,
+
+                # PDF for preview; available in both output formats (pdf and pdf_and_jpeg)
+                'pdf_file_pathname': pdf_file_pathname,
+                'pdf_filename': pdf_filename,
+                'pdf_file_url': pdf_file_url,
+
+                'download_file_url': download_file_url
+                })
+        t.start()
+
+    elif output_page_option == 'pdf-for-each-scanned-page':
+        output_pdf_pathnames = []
+        for i, image_file in enumerate(image_files_list):
+            pdf_filename = f'{output_filename_stem}_{str(i+1).zfill(3)}.pdf'
+            pdf_file_pathname = os.path.join(output_dir, pdf_filename)
+            convert_process = convert_images_to_pdf([image_file], pdf_file_pathname)
+            while(True):
+                rc = convert_process.poll()
+                if rc is None:
+                    # rc is None: the process has NOT been terminated.
+                    pass
+                else:
+                    # Process has been terminated
+                    logging.info(f'PDF file {i} rc: {rc}')
+                    if rc == 0:
+                        output_pdf_pathnames.append(pdf_file_pathname)
+
+                        # Don't do this; this would add each character of string
+                        # pdf_file_pathname as separate list elements
+                        # output_pdf_pathnames += pdf_file_pathname
+                        logging.info(f'PDF generated: {pdf_file_pathname}')
+                    else:
+                        logging.warn(f'{image_file} might not have been successfully converted to a PDF file')
+                    break
+
+        # If no errors occurred during the conversions, all image files
+        # have been converted to PDF files.
+        # Onto creating a zip file.
+        zip_filename = f'{output_filename_stem}.zip'
+        zipfile_path = os.path.join(output_dir, zip_filename)
+        logging.info(f'Zipping {len(output_pdf_pathnames)} PDF files')
+        logging.info(f'PDF pathnames: {output_pdf_pathnames}')
+        with zipfile.ZipFile(zipfile_path, 'w') as pages_zip:
+            for pdf_path in output_pdf_pathnames:
+                pages_zip.write(pdf_path, f'{arc_dir}/{os.path.basename(pdf_path)}')
+            if output_format == 'pdf_and_jpeg':
+                pages_zip.write(images_zip_pathname, f'{arc_dir}/{images_zip_filename}')
+
+        download_zipfile_size = get_file_size_in_bytes(zipfile_path)
+        event_listener.on_state_changed({
+            'state': 'download_ready',
+            'download_file_url': output_dir_url + '/' + zip_filename,
+            'download_file_size': download_zipfile_size})
+    elif output_page_option == 'pdf-for-each-2-scanned-pages':
+        logging.error('PDF file for each 2 scanned pages: not implemented')
+    else:
+        logging.error('Unrecognized output page option')
+
 def on_scan_complete(
     output_dir,
     output_dir_url,
@@ -233,99 +338,16 @@ def on_scan_complete(
             })
 
     if output_format == 'pdf' or output_format == 'pdf_and_jpeg':
-        # Generate PDF from image files
-        event_listener.on_state_changed({'state': 'converting', 'message': 'Converting image files into a PDF file...'})
-
-        # A pathname of the output file (pdf or zip)
-        ext = '.pdf' if output_format == 'pdf' else '.zip'
-        output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
-        logging.info('output_file_pathname: {}'.format(output_file_pathname))
-
-        # output_dir starts with 'static' without the leading forward slash
-        # Run the convert command asynchronously and monitor the stdout
-
-        download_file_url = output_dir_url + '/' + output_filename_stem + ext
-        logging.info('download_file_url: {}'.format(download_file_url))
-
-        image_files_list = subprocess.check_output(
-            ['ls {}'.format(os.path.join(output_dir,'*.jpg'))],
-            shell=True).decode('utf-8').split()
-        if output_page_option == 'single-pdf-file':
-            # PDF for review purpose (available whether the output format is
-            # pdf or combined zip file of pdf and image files)
-            pdf_filename = output_filename_stem + '.pdf'
-            pdf_file_pathname = os.path.join(output_dir, pdf_filename)
-            pdf_file_url = output_dir_url + '/' + pdf_filename
-
-            convert_process = convert_images_to_pdf(image_files_list, pdf_file_pathname)
-            t = threading.Thread(target=convert_process_main_loop,
-                kwargs={
-                    'process': convert_process,
-                    'output_format': output_format,
-                    'output_dir': output_dir,
-                    'output_file_pathname': output_file_pathname,
-                    'arc_dir': arc_dir,
-
-                    # These 2 args are empty string if output_format == 'pdf'
-                    'images_zip_pathname': images_zip_pathname,
-                    'images_zip_filename': images_zip_filename,
-
-                    # PDF for preview; available in both output formats (pdf and pdf_and_jpeg)
-                    'pdf_file_pathname': pdf_file_pathname,
-                    'pdf_filename': pdf_filename,
-                    'pdf_file_url': pdf_file_url,
-
-                    'download_file_url': download_file_url
-                    })
-            t.start()
-
-        elif output_page_option == 'pdf-for-each-scanned-page':
-            output_pdf_pathnames = []
-            for i, image_file in enumerate(image_files_list):
-                pdf_filename = f'{output_filename_stem}_{str(i+1).zfill(3)}.pdf'
-                pdf_file_pathname = os.path.join(output_dir, pdf_filename)
-                convert_process = convert_images_to_pdf([image_file], pdf_file_pathname)
-                while(True):
-                    rc = convert_process.poll()
-                    if rc is None:
-                        # rc is None: the process has NOT been terminated.
-                        pass
-                    else:
-                        # Process has been terminated
-                        logging.info(f'PDF file {i} rc: {rc}')
-                        if rc == 0:
-                            output_pdf_pathnames.append(pdf_file_pathname)
-
-                            # Don't do this; this would add each character of string
-                            # pdf_file_pathname as separate list elements
-                            # output_pdf_pathnames += pdf_file_pathname
-                            logging.info(f'PDF generated: {pdf_file_pathname}')
-                        else:
-                            logging.warn(f'{image_file} might not have been successfully converted to a PDF file')
-                        break
-
-            # If no errors occurred during the conversions, all image files
-            # have been converted to PDF files.
-            # Onto creating a zip file.
-            zip_filename = f'{output_filename_stem}.zip'
-            zipfile_path = os.path.join(output_dir, zip_filename)
-            logging.info(f'Zipping {len(output_pdf_pathnames)} PDF files')
-            logging.info(f'PDF pathnames: {output_pdf_pathnames}')
-            with zipfile.ZipFile(zipfile_path, 'w') as pages_zip:
-                for pdf_path in output_pdf_pathnames:
-                    pages_zip.write(pdf_path, f'{arc_dir}/{os.path.basename(pdf_path)}')
-                if output_format == 'pdf_and_jpeg':
-                    pages_zip.write(images_zip_pathname, f'{arc_dir}/{images_zip_filename}')
-
-            download_zipfile_size = get_file_size_in_bytes(zipfile_path)
-            event_listener.on_state_changed({
-                'state': 'download_ready',
-                'download_file_url': output_dir_url + '/' + zip_filename,
-                'download_file_size': download_zipfile_size})
-        elif output_page_option == 'pdf-for-each-2-scanned-pages':
-            logging.error('PDF file for each 2 scanned pages: not implemented')
-        else:
-            logging.error('Unrecognized output page option')
+        # Generate a PDF file / PDF files from the image files.
+        # - Add the PDF file(s) to the zip file if output is images + pdf(s)
+        # - Create a zip file if output is set to "1 pdf file per page"
+        generate_pdf_from_image_files(
+            output_format,
+            output_dir,
+            output_dir_url,
+            output_page_option,
+            output_filename_stem,
+            images_zip_pathname)
 
 def get_file_size_in_bytes(pathname):
     return os.stat(pathname).st_size
