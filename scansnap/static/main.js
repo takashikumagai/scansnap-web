@@ -145,6 +145,9 @@ function startScan() {
     = document.querySelector('#each-page-into-separate-pdf').checked ?
     'pdf-for-each-scanned-page' : 'single-pdf-file';
 
+    const v = parseInt(document.querySelector('#starting-page-number').value);
+    const starting_page_number = (Number.isInteger(v) && (0 <= v)) ? v : 1;
+
     let scanParams = {
         paper_size: paperSize,
         sides: getSelectedRadioButtonValue('sides'),
@@ -153,7 +156,8 @@ function startScan() {
         resolution: getSelectedRadioButtonValue('resolution'),
         output_format: getSelectedRadioButtonValue('output_format'),
         output_page_option: output_option,
-        page_rotate_options: rotate_options
+        page_rotate_options: rotate_options,
+        starting_page_number: starting_page_number
     };
     (async () => {
         const rawResponse = await fetch('/scan', {

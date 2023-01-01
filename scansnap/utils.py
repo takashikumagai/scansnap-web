@@ -433,6 +433,7 @@ def convert_images_to_pdf(image_files_list, output_pdf_pathname):
 # - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
 def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_mode='color',
                 brightness=25,
+                starting_page_number=1,
                 output_dir='.'):
 
     cmd = []
@@ -498,6 +499,9 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     # Turn on the batch mode option
     cmd += ['--batch={}'.format(os.path.join(output_dir,'out%03d.jpg'))]
 
+    # Page number to start naming files with
+    cmd += ['--batch-start={}'.format(starting_page_number)]
+
     # front side only or duplex (front & back)
     source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
     cmd += ['--source', source]
@@ -525,6 +529,7 @@ def scan_and_save_results(
     color_mode='color',
     brightness=25,
     page_rotate_options='',
+    starting_page_number=1,
     output_dir='.',
     output_dir_url='',
     output_format='pdf',
@@ -562,6 +567,7 @@ def scan_and_save_results(
         sides=sides,
         color_mode=color_mode,
         brightness=brightness,
+        starting_page_number=starting_page_number,
         output_dir=output_dir
         )
 

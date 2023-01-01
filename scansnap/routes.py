@@ -78,7 +78,7 @@ def scan():
         brightness = content['brightness'],
         sides = content['sides'],
         page_rotate_options = content['page_rotate_options'],
-
+        starting_page_number = content['starting_page_number'],
         # Working directory for this package > set to '(path to the package dir)/scansnap/' for scripts of the package?
         output_dir=output_dir,
         output_dir_url=output_dir_url,
