@@ -10,7 +10,7 @@ ScanSnap iX500 by Fujitsu is a compact and handy home scanner. Fujitsu provides 
 ## Requirements:
 ### Server
 - An i386/amd64 PC running Linux (tested with Ubuntu 18.04 LTS and Debian 10)
-- The following packages need to be installed to a PC that satisfies the requirement above:
+- The following packages need to be installed on a PC that satisfies the requirement above:
   - Official ScanSnap driver from Fujitsu's website
   - ImageMagick (for generating PDF files from jpeg images)
   - Python 3.6 or higher

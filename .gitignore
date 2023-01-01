@@ -1,5 +1,6 @@
 __pychache__
 *.pyc
 *.log
+Pipfile.lock
 utils.yml
 scansnap/static/scanned_documents
