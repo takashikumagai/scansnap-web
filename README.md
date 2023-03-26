@@ -2,6 +2,8 @@
 
 An application to use a Fujitsu's ScanSnap scanner from browsers.
 
+<img src="assets/scansnap-web.png" alt="scansnap-web" width="800"/>
+
 ## Background
 ScanSnap scanners are a line of compact and handy home scanner products made by Fujitsu. Fujitsu provides drivers for Windows and Linux, but GUI is only available on Windows. This application provides a Web-based GUI to control a ScanSnap scanner over the network (within the same subnet) and is designed to run on a small form factor Linux PC* or a laptop/desktop Linux PC. For the moment, the application is mainly intended to be used on a small local network and is mostly for a personal use.
 
