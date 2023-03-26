@@ -497,7 +497,7 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     logging.info('output_dir: {}'.format(output_dir))
 
     # Turn on the batch mode option
-    cmd += ['--batch={}'.format(os.path.join(output_dir,'out%03d.jpg'))]
+    cmd += ['--batch={}'.format(os.path.join(output_dir,'page%03d.jpg'))]
 
     # Page number to start naming files with
     cmd += ['--batch-start={}'.format(starting_page_number)]
