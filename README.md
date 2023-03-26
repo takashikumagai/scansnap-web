@@ -1,9 +1,9 @@
 # ScanSnap Web
 
-An application to control Fujitsu's ScanSnap devices from browsers.
+An application to use a Fujitsu's ScanSnap scanner from browsers.
 
 ## Background
-ScanSnap iX500 by Fujitsu is a compact and handy home scanner. Fujitsu provides drivers for Windows and Linux, but GUI is only available on Windows. This application provides a Web-based GUI to control a ScanSnap scanner over the network (within the same subnet) and is designed to run on a small form factor Linux PC*. For the moment, the application is mainly intended to be used on a small local network and is geared toward family or a share house.
+ScanSnap scanners are a line of compact and handy home scanner products made by Fujitsu. Fujitsu provides drivers for Windows and Linux, but GUI is only available on Windows. This application provides a Web-based GUI to control a ScanSnap scanner over the network (within the same subnet) and is designed to run on a small form factor Linux PC* or a laptop/desktop Linux PC. For the moment, the application is mainly intended to be used on a small local network and is mostly for a personal use.
 
 \*These PCs are often colloquially called 'mini PCs' or 'Linux box'.
 
@@ -19,4 +19,4 @@ ScanSnap iX500 by Fujitsu is a compact and handy home scanner. Fujitsu provides 
 - A device with a display, e.g. a smartphone, tablet, or laptop, with a modern web browser
 
 ## Tips
-- Note that Fujitsu provides Linux drivers for computers with **i386** and **amd64 (x86_64)** architectures, but **NOT for ARM architecture machines** (last confirmed in early 2019). As such, this application does not run on Raspberry Pi devices (I confirmed it with a Pi 3 and indeed it did not work).
+- Note that Fujitsu provides Linux drivers for computers with **i386** and **amd64 (x86_64)** architectures, but **NOT for ARM architecture machines** (last confirmed in early 2019). As such, this application does not run on Raspberry Pi devices (I tried the driver with a Pi 3 and confirmed that it does not work).
