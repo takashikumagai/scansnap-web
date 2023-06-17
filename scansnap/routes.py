@@ -59,7 +59,8 @@ def get_scanner_info():
 def scan():
     content = request.json
 
-    logging.info('main:paper_size: {}'.format(content['paper_size']))
+    logging.info('main:sheet_width: {}'.format(content['sheet_width']))
+    logging.info('main:sheet_height: {}'.format(content['sheet_height']))
     logging.info('main:sides: {}'.format(content['sides']))
     logging.info('main:color: {}'.format(content['color']))
     logging.info('main:resolution: {}'.format(content['resolution']))
@@ -72,7 +73,8 @@ def scan():
         logging.error('output_dir_url ending with /')
 
     scan_and_save_results(
-        paper_size = content['paper_size'],
+        sheet_width = content['sheet_width'],
+        sheet_height = content['sheet_height'],
         resolution = content['resolution'],
         color_mode = content['color'],
         brightness = content['brightness'],

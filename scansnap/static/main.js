@@ -121,19 +121,31 @@ function resetBrightness() {
     document.querySelector("#brightness-value").innerHTML = defaultBrightness;
 }
 
-// Encodes the custom paper size in the form of a comma-separated string
-// Example: 'custom,100,200'
-function encodeCustomPaperSize() {
-    return `custom,
-    ${document.querySelector('#custom-width').value.trim()},
-    ${document.querySelector('#custom-height').value.trim()}`;
+// Returns the custom paper size as an integer array containing 2 numbers,
+// width and height, respectively.
+function getCustomPaperSize() {
+    return [
+        parseInt(document.querySelector('#custom-width').value.trim()),
+        parseInt(document.querySelector('#custom-height').value.trim())
+    ];
 }
+
+const paperSizeMap = new Map([
+    ['a4-portrait', [215, 297]],
+    ['a5-portrait', [150, 215]],
+    ['a5-landscape', [215, 150]],
+    ['letter', [221, 284]],
+    ['b5-portrait', [185, 260]],
+    ['jp-postcard-2-fold', [153, 205]],
+    ['jp-postcard-3-fold', [153, 308]],
+    ['jp-business-card-portrait', [56, 91]]
+]);
 
 function startScan() {
     console.log('Starting the scan');
     const paperSizeValue = getSelectedRadioButtonValue('paper_size');
     const paperSize = (paperSizeValue == 'custom-size') ?
-    encodeCustomPaperSize() : paperSizeValue;
+    getCustomPaperSize() : paperSizeMap.get(paperSizeValue);
     let rotate_options = '';
     if(document.querySelector('#rotate-page-90-degrees').checked) {
         rotate_options += 'rotate_by_90_degrees';
@@ -149,7 +161,8 @@ function startScan() {
     const starting_page_number = (Number.isInteger(v) && (0 <= v)) ? v : 1;
 
     let scanParams = {
-        paper_size: paperSize,
+        sheet_width: paperSize[0],
+        sheet_height: paperSize[1],
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
         brightness: document.querySelector('#brightness-slider').value,

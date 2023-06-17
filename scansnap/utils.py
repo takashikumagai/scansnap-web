@@ -431,7 +431,7 @@ def convert_images_to_pdf(image_files_list, output_pdf_pathname):
 # Executes the scanimage command asynchronously and returns the process object
 # - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
 # - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
-def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_mode='color',
+def scan_papers(sheet_width=215, sheet_height=297, resolution=200, sides='front', color_mode='color',
                 brightness=25,
                 starting_page_number=1,
                 output_dir='.'):
@@ -454,33 +454,7 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     cmd += ['--buffer-size=1024']
 
     # Page width and height (unit: mm)
-    w, h = 215, 297 # Unsupported paper size will fall back on A4 portrait
-    if paper_size == 'a4-portrait':
-        w, h = 215, 297
-    elif paper_size == 'a5-portrait':
-        w, h = 150, 215
-    elif paper_size == 'a5-landscape':
-        w, h = 215, 150
-    elif paper_size == 'letter':
-        w, h = 221, 284
-    elif paper_size == 'b5-portrait':
-        w, h = 185, 260
-    elif paper_size == 'jp-postcard-2-fold':
-        w, h = 153, 205
-    elif paper_size == 'jp-postcard-3-fold':
-        w, h = 153, 308
-    elif paper_size == 'jp-business-card-portrait':
-        w, h = 56, 91
-    elif paper_size.find('custom') == 0:
-        logging.info('Custom paper size info: {}'.format(paper_size))
-        # Unpack paper_size (example: 'custom,125,80').
-        # Guard against floating-point numbers, e.g. 10.5
-        # by converting the string to float first.
-        w, h = [int(float(x)) for x in paper_size.split(',')[1:]]
-    else:
-        logging.warning('An unsupported paper size: {}'.format(paper_size))
-
-    cmd += ['--page-width', str(w), '--page-height', str(h)]
+    cmd += ['--page-width', str(sheet_width), '--page-height', str(sheet_height)]
 
     # Resolution
     cmd += ['--resolution={}'.format(resolution)]
@@ -523,7 +497,8 @@ def scan_papers(paper_size='a4-portrait', resolution=200, sides='front', color_m
     return p
 
 def scan_and_save_results(
-    paper_size='a4-portrait',
+    sheet_width=215,
+    sheet_height=297,
     resolution=200,
     sides='front',
     color_mode='color',
@@ -562,7 +537,8 @@ def scan_and_save_results(
     # This executes the scanimage command and returns without
     # waiting for the command to finish
     p = scan_papers(
-        paper_size=paper_size,
+        sheet_width=sheet_width,
+        sheet_height=sheet_height,
         resolution=resolution,
         sides=sides,
         color_mode=color_mode,
