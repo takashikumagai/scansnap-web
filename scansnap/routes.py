@@ -9,7 +9,7 @@ from scansnap.utils import scan_and_save_results, get_scanner_info_sync
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/main", methods=['GET', 'POST'])
 def app_main():
-    logging.info('/ or /main, request: {}'.format(request.method))
+    logging.info(f'/ or /main, request: {request.method}')
 
     return render_template('main.html')
 
@@ -17,13 +17,11 @@ def app_main():
 def app_home():
     form = ScanSettingsForm()
 
-    logging.info('/home, request: {}'.format(request.method))
-    logging.info('color: {}, sides: {}, paper size: {}, resolution: {}'.format(
-        form.color.data,
-        form.sides.data,
-        form.paper_size.data,
-        form.resolution.data
-    ))
+    logging.info(f'/home, request: {request.method}')
+    logging.info(f'color: {form.color.data}, '
+                 f'sides: {form.sides.data}, '
+                 f'paper size: {form.paper_size.data}, '
+                 f'resolution: {form.resolution.data}')
     if form.validate_on_submit():
         logging.info('Scan papers')
         # User submitted a valid form in the form of a POST request
@@ -59,11 +57,11 @@ def get_scanner_info():
 def scan():
     content = request.json
 
-    logging.info('main:sheet_width: {}'.format(content['sheet_width']))
-    logging.info('main:sheet_height: {}'.format(content['sheet_height']))
-    logging.info('main:sides: {}'.format(content['sides']))
-    logging.info('main:color: {}'.format(content['color']))
-    logging.info('main:resolution: {}'.format(content['resolution']))
+    logging.info(f"main:sheet_width: {content['sheet_width']}")
+    logging.info(f"main:sheet_height: {content['sheet_height']}")
+    logging.info(f"main:sides: {content['sides']}")
+    logging.info(f"main:color: {content['color']}")
+    logging.info(f"main:resolution: {content['resolution']}")
 
     output_dirpath = os.path.join('scanned_documents', secrets.token_hex(8))
     output_dir = os.path.join(current_app.root_path, 'static', output_dirpath)

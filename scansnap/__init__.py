@@ -21,7 +21,7 @@ import scansnap.utils
 
 
 log_format = '%(asctime)-15s %(thread)d %(message)s'
-logging.basicConfig(filename='scansnap_{}.log'.format(datetime.date.today().isoformat()), level=logging.DEBUG, format=log_format)
+logging.basicConfig(filename=f'scansnap_{datetime.date.today().isoformat()}.log', level=logging.DEBUG, format=log_format)
 
 logging.info('🐱🐱🐱🐱🐱🐱 Logger configured. Initializing the app.')
 
@@ -62,13 +62,13 @@ scansnap.websocketserver.start_web_socket_server(ws_port)
 try:
     with open('utils.yml') as f:
         settings = yaml.safe_load(f)
-        logging.info('Loading configuration: {}'.format(str(settings)))
+        logging.info(f'Loading configuration: {str(settings)}')
         # True/False in yaml file is recognized as boolean values in Python,
         # i.e. (settings['test_mode'] == 'True') will return False if lhs is
         # True as it would be comparing a boolean value and a string
         scansnap.utils.Settings.test_mode = settings['test_mode']
         logging.info(settings['test_mode'])
-        logging.info('scansnap.utils.Settings.test_mode: '+str(scansnap.utils.Settings.test_mode))
+        logging.info(f'scansnap.utils.Settings.test_mode: {str(scansnap.utils.Settings.test_mode)}')
         scansnap.utils.Settings.sudo_scanimage = settings['sudo_scanimage']
 except:
     logging.info('Either utils.yml was not found or something else went wrong.')

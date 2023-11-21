@@ -44,7 +44,7 @@ def save_scanned_images_as_zip_file(img_files_dir, zip_file_path, arc_dir):
 def parse_stdout(stdout_lines):
     for line in stdout_lines:
         #line = line.decode('utf-8')
-        logging.info('stdout: {}'.format(line))
+        logging.info(f'stdout: {line}')
 
 def parse_stderr_and_send_events(stderr_lines):
     global event_listener
@@ -52,7 +52,7 @@ def parse_stderr_and_send_events(stderr_lines):
     scan_state = 'scanning'
     progress_report_count = 0
     for line in stderr_lines:
-        logging.info('scan stderr: {}'.format(line))
+        logging.info(f'scan stderr: {line}')
 
         if line.startswith('Scanned page '):
             m = re.search('(?<=Scanned page )\d+', line)
@@ -79,7 +79,7 @@ def parse_stderr_and_send_events(stderr_lines):
             pass
             #logging.info('Some other stderr info')
 
-    logging.info('progress_report_count: {}'.format(progress_report_count))
+    logging.info(f'progress_report_count: {progress_report_count}')
     #return scan_complete
     return scan_state
 
@@ -101,7 +101,7 @@ def rotate_image_and_save(image_path,degrees_to_rotate):
 def rotate_scanned_images(output_dir, rotate):
     if 0 < len(rotate):
         image_files = subprocess.check_output(
-            ['ls {}'.format(os.path.join(output_dir,'*.jpg'))], shell=True)
+            [f"ls {os.path.join(output_dir,'*.jpg')}"], shell=True)
         image_files_list = image_files.decode('utf-8').split()
         if rotate == '90':
             for img_file_name in image_files_list:
@@ -157,7 +157,7 @@ def scan_and_convert_process_main_loop(
         if rc is None:
             pass # None indicates the process has NOT been terminated
         else:
-            logging.info('scanimage process returncode: {}'.format(rc))
+            logging.info(f'scanimage process returncode: {rc}')
             process.stdout.close()
             break
 
@@ -209,16 +209,16 @@ def generate_pdf_from_image_files(
     # A pathname of the output file (pdf or zip)
     ext = '.pdf' if output_format == 'pdf' else '.zip'
     output_file_pathname = os.path.join(output_dir, output_filename_stem + ext)
-    logging.info('output_file_pathname: {}'.format(output_file_pathname))
+    logging.info(f'output_file_pathname: {output_file_pathname}')
 
     # output_dir starts with 'static' without the leading forward slash
     # Run the convert command asynchronously and monitor the stdout
 
     download_file_url = output_dir_url + '/' + output_filename_stem + ext
-    logging.info('download_file_url: {}'.format(download_file_url))
+    logging.info(f'download_file_url: {download_file_url}')
 
     image_files_list = subprocess.check_output(
-        ['ls {}'.format(os.path.join(output_dir,'*.jpg'))],
+        [f"ls {os.path.join(output_dir,'*.jpg')}"],
         shell=True).decode('utf-8').split()
     if output_page_option == 'single-pdf-file':
         # PDF for review purpose (available whether the output format is
@@ -359,7 +359,7 @@ def poll_prrocess(process, on_process_terminated):
             # rc is None: the process has NOT been terminated.
             pass
         else:
-            logging.info('returncode: {}'.format(rc))
+            logging.info(f'returncode: {rc}')
             on_process_terminated()
 
 def convert_process_main_loop(
@@ -383,7 +383,7 @@ def convert_process_main_loop(
             # rc is None: the process has NOT been terminated.
             pass
         else:
-            logging.info('conversion returncode: {}'.format(rc))
+            logging.info(f'conversion returncode: {rc}')
             if rc == 0:
                 if output_format == 'pdf':
                     # Download file is a PDF file; no more conversions / compressions are
@@ -400,7 +400,7 @@ def convert_process_main_loop(
                 else:
                     logging.error('Unsupported output format')
 
-                logging.info('download_file_url: {}'.format(download_file_url))
+                logging.info(f'download_file_url: {download_file_url}')
                 download_file_size = get_file_size_in_bytes(output_file_pathname)
                 event_listener.on_state_changed({
                     'state': 'download_ready',
@@ -422,7 +422,7 @@ def convert_images_to_pdf(image_files_list, output_pdf_pathname):
     convert_cmd = ['convert']
     convert_cmd += image_files_list
     convert_cmd += [output_pdf_pathname]
-    logging.info('convert_cmd: {}'.format(convert_cmd))
+    logging.info(f'convert_cmd: {convert_cmd}')
     p = subprocess.Popen(convert_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     for line in p.stderr:
         logging.info('convert stderr:',line)
@@ -457,7 +457,7 @@ def scan_papers(sheet_width=215, sheet_height=297, resolution=200, sides='front'
     cmd += ['--page-width', str(sheet_width), '--page-height', str(sheet_height)]
 
     # Resolution
-    cmd += ['--resolution={}'.format(resolution)]
+    cmd += [f'--resolution={resolution}']
 
     # Color mode
     mode = 'Gray' if color_mode == 'grayscale' else 'Color'
@@ -468,13 +468,13 @@ def scan_papers(sheet_width=215, sheet_height=297, resolution=200, sides='front'
 
     #output_dir = os.path.join(base_output_dir, secrets.token_hex(8))
     #output_dir = base_output_dir + '/' + secrets.token_hex(8)
-    logging.info('output_dir: {}'.format(output_dir))
+    logging.info(f'output_dir: {output_dir}')
 
     # Turn on the batch mode option
-    cmd += ['--batch={}'.format(os.path.join(output_dir,'page%03d.jpg'))]
+    cmd += [f"--batch={os.path.join(output_dir,'page%03d.jpg')}"]
 
     # Page number to start naming files with
-    cmd += ['--batch-start={}'.format(starting_page_number)]
+    cmd += [f'--batch-start={starting_page_number}']
 
     # front side only or duplex (front & back)
     source = 'ADF Front' if sides == 'front' else 'ADF Duplex'
@@ -486,12 +486,12 @@ def scan_papers(sheet_width=215, sheet_height=297, resolution=200, sides='front'
     if Settings.sudo_scanimage and not Settings.test_mode:
         cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
-    logging.info('cmd: {}'.format(cmd))
+    logging.info(f'cmd: {cmd}')
 
     try:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     except subprocess.CalledProcessError as e:
-        logging.info('scanimage threw an error: {}, {}'.format(e.returncode,e.output))
+        logging.info(f'scanimage threw an error: {e.returncode}, {e.output}')
         event_listener.on_state_changed({'state', 'scan_failed', 'message', 'Scan failed'})
 
     return p
@@ -528,7 +528,7 @@ def scan_and_save_results(
                 # edge on both front and back.
                 rotate = '90,270'
             else:
-                logging.error('Unsupported sides value: {}'.format(sides))
+                logging.error(f'Unsupported sides value: {sides}')
                 return
     else:
         if 0 <= page_rotate_options.find('rotate_even_numbered_page_by_180_degrees'):
@@ -568,10 +568,10 @@ def get_scanner_info_sync():
         if Settings.sudo_scanimage and not Settings.test_mode:
             cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
-        logging.info('scanner check cmd: {}'.format(cmd))
+        logging.info(f'scanner check cmd: {cmd}')
 
         out = ''
-        logging.info('Settings.test_mode : {}'.format(Settings.test_mode))
+        logging.info(f'Settings.test_mode : {Settings.test_mode}')
         if Settings.test_mode:
             out = "device `hambina:NyankoScan N500:1607650' is a HAMBINA NyankoSnap N500 scanner"
         else:
