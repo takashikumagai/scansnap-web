@@ -21,7 +21,8 @@ import scansnap.utils
 
 
 log_format = '%(asctime)-15s %(thread)d %(message)s'
-logging.basicConfig(filename=f'scansnap_{datetime.date.today().isoformat()}.log', level=logging.DEBUG, format=log_format)
+log_filename = f'scansnap_{datetime.date.today().isoformat()}.log'
+logging.basicConfig(filename=log_filename, level=logging.DEBUG, format=log_format)
 
 logging.info('🐱🐱🐱🐱🐱🐱 Logger configured. Initializing the app.')
 
