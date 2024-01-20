@@ -307,6 +307,10 @@ def on_scan_complete(
     rotate,
     output_format
     ):
+    """
+    Generates a PDF file from the images of the scanned pages
+    if the output format(s) include PDF document.
+    """
 
     logging.info('Document scan complete')
 
@@ -428,13 +432,19 @@ def convert_images_to_pdf(image_files_list, output_pdf_pathname):
         logging.info('convert stderr:',line)
     return p
 
-# Executes the scanimage command asynchronously and returns the process object
-# - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
-# - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
-def scan_papers(sheet_width=215, sheet_height=297, resolution=200, sides='front', color_mode='color',
+def scan_papers(sheet_width=215,
+                sheet_height=297,
+                resolution=200,
+                sides='front',
+                color_mode='color',
                 brightness=25,
                 starting_page_number=1,
                 output_dir='.'):
+    """
+    Executes the scanimage command asynchronously and returns the process object
+    - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
+    - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
+    """
 
     cmd = []
 
