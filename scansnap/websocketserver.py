@@ -11,10 +11,10 @@ import threading
 #   of our web socket server.
 # - SimpleWebSocketServer: this one is simply instantiated 
 
-websocket = None
-ws_server = None
 
 class ScannerWebSocket(WebSocket):
+    websocket = None
+    ws_server = None
 
     def __init__(self, server, sock, address):
         super().__init__(server, sock, address)
@@ -23,29 +23,29 @@ class ScannerWebSocket(WebSocket):
         logging.info('ws:message received: {}'.format(self.data))
 
     def handleConnected(self):
-        global websocket
         logging.info('ws:connected')
-        websocket = self
+        self.__class__.websocket = self
 
     def handleClose(self):
         logging.info('ws:closed')
 
 def send_message_to_client(msg):
-    global websocket
     print('websocketserver.send_message_to_client',msg)
-    websocket.sendMessage(msg)
+    if ScannerWebSocket.websocket:
+        ScannerWebSocket.websocket.sendMessage(msg)
 
 def start_web_socket_server(ws_port):
-    global ws_server
 
-    if ws_server is not None:
+    if ScannerWebSocket.ws_server:
         return
 
     logging.info('Setting up the WebSocket server...')
     try:
-        ws_server = SimpleWebSocketServer('', ws_port, ScannerWebSocket)
+        ScannerWebSocket.ws_server = SimpleWebSocketServer('', ws_port, ScannerWebSocket)
         logging.debug("Starting a WebSocket server (port: {}).".format(ws_port))
-        websocket_server_thread = threading.Thread(target = ws_server.serveforever)
+        websocket_server_thread = threading.Thread(
+            target = ScannerWebSocket.ws_server.serveforever
+        )
         websocket_server_thread.start()
     except:
         logging.error('websocket exception:', sys.exc_info()[0])
