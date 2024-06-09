@@ -123,9 +123,10 @@ def rotate_scanned_images(output_dir, rotate):
                 side = side * (-1)
 
 def get_num_scanned_pages_before_jamming(output_dir):
-    jpg_files = [f for f in os.listdir(outdir) if re.match(r'.+\.jpg$', f)]
+    jpg_files = [f for f in os.listdir(output_dir) if re.match(r'.+\.jpg$', f)]
     num_jpg_files = len(jpg_files)
     print(f'{num_jpg_files} JPG files have been created.')
+    return num_jpg_files
 
 # 1. Reads the stdout of the scanimage command and reports the status
 #    to the event listener, e.g. the scanner finished scanning i-th page
