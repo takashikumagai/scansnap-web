@@ -190,7 +190,7 @@ def on_scan_process_terminated(
             rotate,
             output_format
         )
-    elif scan_stage == 'feeder_jammed':
+    elif scan_state == 'feeder_jammed':
         logging.info('Unfortunately, the feeder has jammed.')
         num_scanned_pages = get_num_scanned_pages_before_jamming(output_dir)
     else:
