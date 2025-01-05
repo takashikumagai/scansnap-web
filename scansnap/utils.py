@@ -433,19 +433,15 @@ def convert_images_to_pdf(image_files_list, output_pdf_pathname):
         logging.info('convert stderr:',line)
     return p
 
-def scan_papers(sheet_width=215,
-                sheet_height=297,
-                resolution=200,
-                sides='front',
-                color_mode='color',
-                brightness=25,
-                starting_page_number=1,
-                output_dir='.'):
-    """
-    Executes the scanimage command asynchronously and returns the process object
-    - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
-    - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
-    """
+def build_scanimage_command(
+        sheet_width=215,
+        sheet_height=297,
+        resolution=200,
+        sides='front',
+        color_mode='color',
+        brightness=25,
+        starting_page_number=1,
+        output_dir='.') -> list:
 
     cmd = []
 
@@ -498,6 +494,33 @@ def scan_papers(sheet_width=215,
         cmd.insert(0, 'sudo') # Prepend the command with 'sudo'
 
     logging.info(f'cmd: {cmd}')
+
+    return cmd
+
+def scan_papers(sheet_width=215,
+                sheet_height=297,
+                resolution=200,
+                sides='front',
+                color_mode='color',
+                brightness=25,
+                starting_page_number=1,
+                output_dir='.'):
+    """
+    Executes the scanimage command asynchronously and returns the process object
+    - This function should return fairly quickly as it does not wait until the scanimage command to complete the scan.
+    - output_dir: Directory path on the filesystem where pdf, zipped jpg, and individual jpg files are to be saved
+    """
+
+    cmd = build_scanimage_command(
+        sheet_width,
+        sheet_height,
+        resolution,
+        sides,
+        color_mode,
+        brightness,
+        starting_page_number,
+        output_dir
+    )
 
     try:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
