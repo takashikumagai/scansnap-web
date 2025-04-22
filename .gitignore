@@ -1,7 +1,16 @@
-__pychache__
-*.pyc
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Other files
 *.log
-Pipfile.lock
 utils.yml
-scansnap/static/scanned_documents
 .Trash-*
+scansnap/static/scanned_documents
