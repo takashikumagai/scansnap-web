@@ -11,6 +11,7 @@ flask-wtf = "*"
 pillow = "*"
 simplewebsocketserver = "*"
 pyyaml = "*"
+pytest = "*"
 
 [requires]
 python_version = "3"

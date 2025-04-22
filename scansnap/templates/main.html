@@ -110,11 +110,17 @@
     out to be trickier than expected, and I simply couldn't find a way
     other than creating a new form tag and adding a button there.
 -->
-<div class="container px-3 mb-4">
+<div id="menu-on-successful-scan" class="container px-3 mb-4">
     <form id="download-form" action="" target="_blank">
         <button id="download-button" type="submit" class="btn btn-primary" onclick="">Download</button>
         <span id="download-file-desc"></span>
-    </form>    
+    </form>
+    <div class="collapsible more-action-open-close">
+        More actions
+    </div>
+    <div class="more-actions">
+        <button id="view-scanned-images" type="submit" class="btn btn-primary">View scanned images</button>
+    </div>
 </div>
 
 {% endblock content %}

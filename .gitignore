@@ -4,3 +4,4 @@ __pychache__
 Pipfile.lock
 utils.yml
 scansnap/static/scanned_documents
+.Trash-*
