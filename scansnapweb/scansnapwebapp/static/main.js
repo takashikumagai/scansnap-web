@@ -1,3 +1,13 @@
+// Get the CSRF token from the cookie
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+const getCsrfTokenFromCookie = () => {
+    return getCookie('csrftoken');
+}
 
 var url = 'ws://' + location.hostname + ':2479';
 console.log('WebSocket URL:',url);
@@ -172,12 +182,18 @@ function startScan() {
         page_rotate_options: rotate_options,
         starting_page_number: starting_page_number
     };
+    console.log('scanParams', scanParams);
+    const url = '/scan/'
+    console.log('scan url', url);
+    const csrftoken = getCsrfTokenFromCookie();
+    console.log('csrftoken', csrftoken);
     (async () => {
-        const rawResponse = await fetch('/scan', {
+        const rawResponse = await fetch(url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
             },
             body: JSON.stringify(scanParams)
         });
@@ -186,10 +202,11 @@ function startScan() {
     })();
 }
 
+console.log('hello js');
 fetch('/get-scanner-info')
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log('get-scanner-info', data);
         if(data.scanner_found) {
             document.querySelector('#scan-btn-container').style.visibility = 'visible';
             document.querySelector('#scanner-name').textContent = data.scanner_name;

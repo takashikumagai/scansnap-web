@@ -13,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}">
 </head>
 <body>
+    {% csrf_token %}
     <nav class="navbar sticky-top navbar-dark bg-dark">
         <div class="container">
             <a href="" class="navbar-brand">ScanSnap Web</a>
