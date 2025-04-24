@@ -443,12 +443,7 @@ def build_scanimage_command(
         starting_page_number=1,
         output_dir='.') -> list:
 
-    cmd = []
-
-    if Settings.test_mode:
-        cmd += ['./scanimage_test.py']
-    else:
-        cmd += ['scanimage']
+    cmd = ['scanimage']
 
     # Add the '-p' option to display the progress
     cmd += ['-p']

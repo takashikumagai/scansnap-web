@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ "$1" == "--test" ]; then
+    PATH="scanimage-test-command:$PATH"
+fi
+
 cd scansnapweb
 
 uv run python manage.py runserver
