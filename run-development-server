@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 if [ "$1" == "--test" ]; then
-    PATH="scanimage-test-command:$PATH"
+    printf "development server test mode\n"
+    PATH="../scanimage-test-command:$PATH"
 fi
 
 cd scansnapweb
