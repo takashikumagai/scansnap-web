@@ -3,7 +3,7 @@
 # To test this script, execute this:
 # ./scanimage_test.py --page-width 12 --batch=./aaa/out%02d.png
 
-import os
+import re
 import sys
 import time
 import argparse
@@ -45,9 +45,14 @@ for i in range(1,num_pages+1):
     print_to_stderr('Scanned page {}. (scanner status = 5)'.format(i))
     # filename = 'out{}.png'.format(str(i).zfill(3))
     # img_path = os.path.join(output_dir,filename)
-    img_path = output_fmt_str % (i)
+    # Only support integer format strings, e.g. '%d', '%0Nd'
+    if output_fmt_str and re.search("%\\d+d", output_fmt_str):
+        img_path = output_fmt_str % (i)
+    else:
+        img_path = output_fmt_str
     print(img_path)
-    img.save(img_path)
+    if img_path:
+        img.save(img_path)
     time.sleep(1.0)
 
 print('scanimage: sane_start: Document feeder out of documents')
