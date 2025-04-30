@@ -8,6 +8,10 @@ import secrets
 import zipfile
 from PIL import Image
 
+
+logger = logging.getLogger("scansnap_web")
+
+
 class Settings:
 
     # If True, uses the fake scanimage command for testing,
@@ -540,7 +544,7 @@ def scan_and_save_results(
     output_page_option='single-pdf-file'
     ):
 
-    logging.info(f'page_rotate_options: {page_rotate_options}')
+    logger.info(f'page_rotate_options: {page_rotate_options}')
 
     rotate = ''
     #if rotate_page_90_degrees:
@@ -565,7 +569,7 @@ def scan_and_save_results(
 
     # This executes the scanimage command and returns without
     # waiting for the command to finish
-    p = scan_papers(
+    scan_process = scan_papers(
         sheet_width=sheet_width,
         sheet_height=sheet_height,
         resolution=resolution,
@@ -574,12 +578,12 @@ def scan_and_save_results(
         brightness=brightness,
         starting_page_number=starting_page_number,
         output_dir=output_dir
-        )
+    )
 
     t = threading.Thread(
         target=scan_and_convert_process_main_loop,
         kwargs={
-            'process': p,
+            'process': scan_process,
             'output_dir': output_dir,
             'output_dir_url': output_dir_url,
             'output_page_option': output_page_option,
