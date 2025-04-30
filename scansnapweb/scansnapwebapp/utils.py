@@ -12,14 +12,14 @@ class Settings:
 
     # If True, uses the fake scanimage command for testing,
     # i.e. does not use a real scanner device.
-    test_mode = True
+    test_mode = False
 
     # TODO: find a way to execute scanimage without sudo
     # On a Ubuntu 18.04 LTS PC (a small fanless box) that I have,
     # sudo is required to execute the scanimage command, so I
     # (reluctantly) added this option.
     # On a laptop running 16.04, this is not necessary.
-    sudo_scanimage = True
+    sudo_scanimage = False
 
 class EventListenerBase:
     def on_state_changed(self,data):
@@ -618,6 +618,7 @@ def get_scanner_info_sync():
             # is evaluated first, so the statement below does not throw
             # an exception even when m is None
             scanner_name = m.group(0)[7:-8] if m is not None else "Couldn't get the scanner name"
+            print("scanner_name", scanner_name)
             return {'scanner_found': True, 'scanner_name': scanner_name}
 
     except subprocess.CalledProcessError:

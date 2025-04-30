@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # To test this script, execute this:
 # ./scanimage_test.py --page-width 12 --batch=./aaa/out%02d.png
@@ -14,6 +14,7 @@ def print_to_stderr(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-L', '--list-devices', action='store_true')
 parser.add_argument('--batch')
 parser.add_argument('--mode')
 parser.add_argument('--format')
@@ -24,8 +25,13 @@ parser.add_argument('--page-height')
 parser.add_argument('--brightness')
 parser.add_argument('--buffer-size')
 parser.add_argument('-p', action='store_true')
-print('sys.argv[1:]',sys.argv[1:])
+# print('sys.argv[1:]',sys.argv[1:])
 args = parser.parse_args(sys.argv[1:])
+
+if args.list_devices:
+    print("device `tabby:meowscan M1000:1234560' is a TABBY meowscan M1000 scanner")
+    exit(0)
+
 print(args)
 print('batch:',args.batch)
 print('page width & height:', args.page_width, args.page_height)

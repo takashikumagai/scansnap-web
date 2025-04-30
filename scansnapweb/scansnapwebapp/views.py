@@ -12,11 +12,11 @@ def hello(request):
 def home(request):
     return render(request, "main.html", context={})
 
-def get_scanner_info_sync():
-    return {"scanner_found": True, "scanner_name": "meowscan"}
+# def get_scanner_info_sync():
+#     return {"scanner_found": True, "scanner_name": "meowscan"}
 
 def get_scanner_info(request):
-    return JsonResponse(get_scanner_info_sync())
+    return JsonResponse(utils.get_scanner_info_sync())
 
 def scan(request):
     content = json.loads(request.body.decode('utf-8'))
