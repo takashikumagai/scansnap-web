@@ -14,3 +14,4 @@ wheels/
 utils.yml
 .Trash-*
 scansnap/static/scanned_documents
+db.sqlite3

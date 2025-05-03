@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# To apply a DB migration, run
+# ```
+# $ cd scansnapweb
+# $ uv run python manage.py migrate
+# ```
+
 if [ "$1" == "--test" ]; then
     printf "development server test mode\n"
     PATH="../scanimage-test-command:$PATH"
