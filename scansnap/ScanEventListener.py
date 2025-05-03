@@ -1,8 +1,6 @@
 import json
-import logging
 import scansnap.utils 
 import scansnap.websocketserver
-from flask import url_for
 
 class ScanEventListener(scansnap.utils.EventListenerBase):
 

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, RadioField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import SubmitField, RadioField
+from wtforms.validators import DataRequired
 
 class ScanSettingsForm(FlaskForm):
 

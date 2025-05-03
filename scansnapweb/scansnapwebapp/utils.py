@@ -4,7 +4,6 @@ import os
 import subprocess
 import threading
 import re
-import secrets
 import zipfile
 from PIL import Image
 

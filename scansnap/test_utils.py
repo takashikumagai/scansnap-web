@@ -1,7 +1,5 @@
 
 from unittest.mock import patch
-from PIL import Image
-import pytest
 
 from . import utils
 
