@@ -11,7 +11,7 @@ def hello(request):
     return JsonResponse({"message": "hello"})
 
 def home(request):
-    return render(request, "main.html", context={})
+    return render(request, "scansnapwebapp/main.html", context={})
 
 # def get_scanner_info_sync():
 #     return {"scanner_found": True, "scanner_name": "meowscan"}
