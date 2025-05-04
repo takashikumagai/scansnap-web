@@ -1,108 +1,118 @@
 {% extends 'layout.html' %}
 {% block content %}
-
 <form action="" method="POST">
+  <fieldset>
+    <div class="container mx-auto p-4">
+      <!-- Paper Size -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Paper Size and Orientation</div>
+        <div class="p-4 space-y-2">
+          <label class="block">
+            <input type="radio" name="paper_size" value="a4-portrait" onclick="onFixedSizeClicked()" checked class="mr-2">
+            A4 Portrait
+          </label>
+          <label class="block">
+            <input type="radio" name="paper_size" value="a5-portrait" onclick="onFixedSizeClicked()" class="mr-2">
+            A5 Portrait
+          </label>
+          <label class="block">
+            <input type="radio" name="paper_size" value="a5-landscape" onclick="onFixedSizeClicked()" class="mr-2">
+            A5 Landscape
+          </label>
+          <label class="block">
+            <input type="radio" name="paper_size" value="letter" onclick="onFixedSizeClicked()" class="mr-2">
+            Letter
+          </label>
+          <div class="mt-2">
+            <input type="radio" name="paper_size" value="custom-size" onclick="onCustomSizeClicked()" class="mr-2">
+            Custom size
+            <input type="text" id="custom-width" disabled class="border mx-2 px-2 py-1 w-20">
+            ×
+            <input type="text" id="custom-height" disabled class="border mx-2 px-2 py-1 w-20">
+            mm
+          </div>
 
-    <fieldset class="form-group">
-        <div class="container">
-            <div class="card mt-3 mb-4">
-                <div class="card-header">Paper Size and Orientation</div>
-                <div class="card-body custom-control custom-radio">
-                    <div class="p-2">
-                        <input type="radio" class="m-2" name="paper_size" value="a4-portrait" onclick="onFixedSizeClicked()" checked>A4 Portrait
-                        <input type="radio" class="m-2" name="paper_size" value="a5-portrait" onclick="onFixedSizeClicked()">A5 Portrait
-                        <input type="radio" class="m-2" name="paper_size" value="a5-landscape" onclick="onFixedSizeClicked()">A5 Landscape
-                        <input type="radio" class="m-2" name="paper_size" value="letter" onclick="onFixedSizeClicked()">Letter
-                        <br>
-                        <input type="radio" class="m-2" name="paper_size" value="custom-size" onclick="onCustomSizeClicked()">Custom size
-                        <input type="text" class="m-2" id="custom-width" disabled>
-                        &times;
-                        <input type="text" class="m-2" id="custom-height" disabled>
-                        mm
-                        <div class="collapsible more-paper-size-options">More paper sizes</div>
-                        <div class="more-paper-sizes">
-                            <input type="radio" class="m-2" name="paper_size" value="b5-portrait" onclick="onFixedSizeClicked()">B5 Portrait
-                            <input type="radio" class="m-2" name="paper_size" value="jp-postcard-2-fold" onclick="onFixedSizeClicked()">Japanese Postcard (2-fold)
-                            <input type="radio" class="m-2" name="paper_size" value="jp-postcard-3-fold" onclick="onFixedSizeClicked()">Japanese Postcard (3-fold)
-                            <input type="radio" class="m-2" name="paper_size" value="jp-business-card-portrait" onclick="onFixedSizeClicked()">Japanese Business Card
-                        </div>
+          <div class="text-blue-600 cursor-pointer mt-2 collapsible more-paper-size-options">More paper sizes</div>
+          <div class="hidden more-paper-sizes space-y-1">
+            <label class="block"><input type="radio" name="paper_size" value="b5-portrait" onclick="onFixedSizeClicked()" class="mr-2">B5 Portrait</label>
+            <label class="block"><input type="radio" name="paper_size" value="jp-postcard-2-fold" onclick="onFixedSizeClicked()" class="mr-2">Japanese Postcard (2-fold)</label>
+            <label class="block"><input type="radio" name="paper_size" value="jp-postcard-3-fold" onclick="onFixedSizeClicked()" class="mr-2">Japanese Postcard (3-fold)</label>
+            <label class="block"><input type="radio" name="paper_size" value="jp-business-card-portrait" onclick="onFixedSizeClicked()" class="mr-2">Japanese Business Card</label>
+          </div>
 
-                        <!-- Show red frame around the option to caution the user -->
-                        <div id="rotate-option-container">
-                            <input type="checkbox" id="rotate-page-90-degrees" onclick="onRotateOptionClicked()">
-                            Turn the scanned pages by 90 degrees to output as landscape
-                        </div>
-                        <div id="even-numbered-page-rotation-option-container">
-                            <input type="checkbox" id="rotate-even-numbered-pages-180-degrees" onclick="onRotateOptionClicked()">
-                            Turn the even-numbered pages by 180 degrees
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">Sides</div>
-                <div class="card-body custom-control custom-radio">
-                    <span class="p-4">
-                        <input type="radio" class="m-2" name="sides" value="front">One side
-                        <input type="radio" class="m-2" name="sides" value="duplex" checked>Both sides (front & back)
-                    </span>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">Color</div>
-                <div class="card-body custom-control custom-radio">
-                    <span class="p-4">
-                        <input type="radio" class="m-2" name="color" value="color" checked>Color
-                        <input type="radio" class="m-2" name="color" value="grayscale">Grayscale
-                    </span>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">Brightness</div>
-                <div class="card-body">
-                    <span class="p-4">
-                        <span id="brightness-value" class="mr-4">0</span>
-                        <input type="range" class="custom-range" id="brightness-slider" name="brightness" min="-100" max="100" oninput="updateBrightnessSlider(this.value)">
-                    </span>
-                    <button class="btn btn-primary" type="button" id="brightness-slider-reset-button" onclick="resetBrightness()">Reset to default</button>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">Resolution</div>
-                <div class="card-body custom-control custom-radio">
-                    <span class="p-4">
-                        <input type="radio" class="m-2" name="resolution" value="200" checked>200
-                        <input type="radio" class="m-2" name="resolution" value="300">300
-                        <input type="radio" class="m-2" name="resolution" value="400">400
-                    </span>
-                </div>            
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">Output Format</div>
-                <div class="card-body custom-control custom-radio">
-                    <div>
-                        <input type="radio" class="m-2" name="output_format" value="pdf" checked>PDF
-                        <input type="radio" class="m-2" name="output_format" value="jpeg">JPEG file(s)
-                        <input type="radio" class="m-2" name="output_format" value="pdf_and_jpeg">PDF & JPEG
-                    </div>
-                    <div class="p-2 output-option-container">
-                        <input type="checkbox" id="each-page-into-separate-pdf">
-                        Save each page to a separate PDF file.
-                        <input type="text" id="starting-page-number" maxlength="4" size="4">
-                        Starting page number
-                    </div>
-                </div>
-            </div>
+          <label class="block mt-3" id="rotate-option-container">
+            <input type="checkbox" id="rotate-page-90-degrees" onclick="onRotateOptionClicked()" class="mr-2">
+            Turn scanned pages by 90 degrees (landscape)
+          </label>
+          <label class="block" id="even-numbered-page-rotation-option-container">
+            <input type="checkbox" id="rotate-even-numbered-pages-180-degrees" onclick="onRotateOptionClicked()" class="mr-2">
+            Turn even-numbered pages by 180 degrees
+          </label>
         </div>
-    </fieldset>
-    <div id="scan-btn-container" class="form-group px-3">
-        <button class="btn btn-primary" type="button" onclick="startScan();">Scan</button>
+      </div>
+
+      <!-- Sides -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Sides</div>
+        <div class="p-4">
+          <label class="mr-4"><input type="radio" name="sides" value="front" class="mr-2">One side</label>
+          <label><input type="radio" name="sides" value="duplex" checked class="mr-2">Both sides</label>
+        </div>
+      </div>
+
+      <!-- Color -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Color</div>
+        <div class="p-4">
+          <label class="mr-4"><input type="radio" name="color" value="color" checked class="mr-2">Color</label>
+          <label><input type="radio" name="color" value="grayscale" class="mr-2">Grayscale</label>
+        </div>
+      </div>
+
+      <!-- Brightness -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Brightness</div>
+        <div class="p-4 space-y-2">
+          <span id="brightness-value" class="inline-block w-10">0</span>
+          <input type="range" id="brightness-slider" name="brightness" min="-100" max="100" oninput="updateBrightnessSlider(this.value)" class="w-full">
+          <button type="button" onclick="resetBrightness()" class="mt-2 bg-blue-600 text-white px-4 py-1 rounded">Reset to default</button>
+        </div>
+      </div>
+
+      <!-- Resolution -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Resolution</div>
+        <div class="p-4">
+          <label class="mr-4"><input type="radio" name="resolution" value="200" checked class="mr-2">200</label>
+          <label class="mr-4"><input type="radio" name="resolution" value="300" class="mr-2">300</label>
+          <label><input type="radio" name="resolution" value="400" class="mr-2">400</label>
+        </div>
+      </div>
+
+      <!-- Output Format -->
+      <div class="border rounded shadow mb-4">
+        <div class="bg-gray-100 px-4 py-2 font-semibold">Output Format</div>
+        <div class="p-4">
+          <label class="mr-4"><input type="radio" name="output_format" value="pdf" checked class="mr-2">PDF</label>
+          <label class="mr-4"><input type="radio" name="output_format" value="jpeg" class="mr-2">JPEG</label>
+          <label><input type="radio" name="output_format" value="pdf_and_jpeg" class="mr-2">PDF & JPEG</label>
+
+          <div class="mt-3 space-y-2">
+            <label class="block"><input type="checkbox" id="each-page-into-separate-pdf" class="mr-2">Each page as a separate PDF</label>
+            <label class="block">
+              <input type="text" id="starting-page-number" maxlength="4" size="4" class="border px-2 py-1 mr-2 w-20">
+              Starting page number
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scan Button -->
+      <div class="text-center">
+        <button type="button" onclick="startScan()" class="bg-blue-600 text-white px-6 py-2 rounded shadow">Scan</button>
+      </div>
     </div>
+  </fieldset>
 </form>
 
 <!--
@@ -110,17 +120,15 @@
     out to be trickier than expected, and I simply couldn't find a way
     other than creating a new form tag and adding a button there.
 -->
-<div id="menu-on-successful-scan" class="container px-3 mb-4">
-    <form id="download-form" action="" target="_blank">
-        <button id="download-button" type="submit" class="btn btn-primary" onclick="">Download</button>
-        <span id="download-file-desc"></span>
-    </form>
-    <div class="collapsible more-action-open-close">
-        More actions
-    </div>
-    <div class="more-actions">
-        <button id="view-scanned-images" type="submit" class="btn btn-primary">View scanned images</button>
-    </div>
-</div>
+<div id="menu-on-successful-scan" class="container mx-auto p-4">
+  <form id="download-form" action="" target="_blank">
+    <button id="download-button" type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow mr-4">Download</button>
+    <span id="download-file-desc"></span>
+  </form>
 
+  <div class="text-blue-600 cursor-pointer mt-4 collapsible more-action-open-close">More actions</div>
+  <div class="hidden more-actions mt-2">
+    <button id="view-scanned-images" type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow">View scanned images</button>
+  </div>
+</div>
 {% endblock content %}

@@ -4,41 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <title>ScanSnap Web</title>
 
-    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon.png' %}">
-</head>
-<body>
-    {% csrf_token %}
-    <nav class="navbar sticky-top navbar-dark bg-dark">
-        <div class="container">
-            <a href="" class="navbar-brand">ScanSnap Web</a>
-            <span id="scanner-name" class="text-white font-weight-bold">Scanner not detected</span>
-        </div>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'scansnapweb-logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
-        </form>
-        {% else %}
-        <a href="{% url 'scansnapweb-login' %}" class="btn btn-outline-light btn-sm">Log in</a>
-        {% endif %}
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" sizes="32x32" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}">
+</head>
+<body class="bg-gray-50 text-gray-900">
+    {% csrf_token %}
+    <!-- Navbar -->
+    <nav class="sticky top-0 bg-gray-800 text-white shadow">
+        <div class="container mx-auto flex items-center justify-between px-4 py-3">
+            <a href="/" class="text-lg font-bold">ScanSnap Web</a>
+            <span id="scanner-name" class="font-semibold">Scanner not detected</span>
+
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'scansnapweb-logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded">Log out</button>
+            </form>
+            {% else %}
+            <a href="{% url 'scansnapweb-login' %}" class="bg-blue-600 text-white px-4 py-2 rounded">Log in</a>
+            {% endif %}
+        </div>
     </nav>
-    <div class="container">
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6">
         {% block content %}{% endblock %}
     </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha384-MYL22lstpGhSa4+udJSGro5I+VfM13fdJfCbAzP9krCEoK5r2EDFdgTg2+DGXdj+" crossorigin="anonymous"></script>
-    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script-->
-    <!-- Bootstrap JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+    <!-- Scripts -->
     <script src="{% static 'main.js' %}"></script>
 </body>
 </html>
