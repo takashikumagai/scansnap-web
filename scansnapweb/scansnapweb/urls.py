@@ -20,5 +20,6 @@ from django.urls import include, path
 urlpatterns = [
     # path("scansnapwebapp/", include("scansnapwebapp.urls")),
     path("", include("scansnapwebapp.urls")),
+    path("", include("users.urls")),
     path('admin/', admin.site.urls),
 ]

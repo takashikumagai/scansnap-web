@@ -1,0 +1,23 @@
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+
+
+class CreateUserForm(UserCreationForm):
+
+    class Meta:
+
+        model = User
+        fields = ["username", "email", "password1", "password2"]
+
+
+class StyledAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            "class": "w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            "placeholder": "Enter your username"
+        })
+        self.fields['password'].widget.attrs.update({
+            "class": "w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            "placeholder": "Enter your password"
+        })
