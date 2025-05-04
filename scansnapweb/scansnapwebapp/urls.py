@@ -5,6 +5,7 @@ urlpatterns = [
 
     # auth
     path("login/", views.scansnapweb_login, name="scansnapweb-login"),
+    path("logout/", views.scansnapweb_logout, name="scansnapweb-logout"),
     path("register/", views.register, name="register"),
 
     # scan

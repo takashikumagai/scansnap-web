@@ -3,14 +3,13 @@ import logging
 from pathlib import Path
 
 from django.http import JsonResponse
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 
 from . import utils
-from .forms import CreateUserForm
+from .forms import CreateUserForm, StyledAuthenticationForm
 
 
 def register(request):
@@ -30,10 +29,10 @@ def scansnapweb_login(request):
     if request.user.is_authenticated:
         return redirect("home")  # or wherever you want
 
-    form = AuthenticationForm()
+    form = StyledAuthenticationForm()
 
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+        form = StyledAuthenticationForm(request, data=request.POST)
         # Note that authenticate() is used under the hood by form.is_valid()
         if form.is_valid():
             user = form.get_user()
@@ -43,6 +42,11 @@ def scansnapweb_login(request):
             messages.error(request, "Invalid username or password.")
 
     return render(request, "registration/login.html", {"form": form})
+
+
+def scansnapweb_logout(request):
+    logout(request)
+    return redirect("scansnapweb-login")
 
 
 def hello(request):

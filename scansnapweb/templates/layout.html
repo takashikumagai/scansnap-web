@@ -19,6 +19,15 @@
             <a href="" class="navbar-brand">ScanSnap Web</a>
             <span id="scanner-name" class="text-white font-weight-bold">Scanner not detected</span>
         </div>
+
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'scansnapweb-logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+        </form>
+        {% else %}
+        <a href="{% url 'scansnapweb-login' %}" class="btn btn-outline-light btn-sm">Log in</a>
+        {% endif %}
     </nav>
     <div class="container">
         {% block content %}{% endblock %}
