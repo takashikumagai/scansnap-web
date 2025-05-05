@@ -1,9 +1,14 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Register</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png" sizes="32x32" />
+
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
   <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
@@ -20,7 +25,7 @@
           {% endif %}
         </div>
       {% endfor %}
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl">
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
         Sign Up
       </button>
     </form>
