@@ -10,10 +10,6 @@ from django.contrib.auth.decorators import login_required
 from . import utils
 
 
-def hello(request):
-    return JsonResponse({"message": "hello"})
-
-
 @login_required(login_url="/login/")
 def home(request):
     return render(request, "scansnapwebapp/main.html", context={})
@@ -60,3 +56,7 @@ def scan(request):
     )
 
     return JsonResponse({'scan': 'started'})
+
+
+def ping(request):
+    return JsonResponse({"status": "UP"})
