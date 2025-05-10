@@ -22,7 +22,7 @@ def get_scanner_info(request):
 
 def scan(request):
     data = json.loads(request.body.decode('utf-8'))
-    print("/scan/ request body:", request_body)
+    print("/scan/ request body:", data)
 
     logging.info(f"main:sheet_width: {data.get('sheet_width')}")
     logging.info(f"main:sheet_height: {data.get('sheet_height')}")
