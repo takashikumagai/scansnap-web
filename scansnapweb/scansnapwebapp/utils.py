@@ -58,12 +58,12 @@ def parse_stderr_and_send_events(stderr_lines):
         logging.info(f'scan stderr: {line}')
 
         if line.startswith('Scanned page '):
-            m = re.search('(?<=Scanned page )\d+', line)
+            m = re.search(r"(?<=Scanned page )\d+", line)
             page = m.group(0)
             event_listener.on_progress_updated({'scanned_page': page})
-        elif re.match('Batch terminated, \d+ page(s)? scanned', line):
+        elif re.match(r"Batch terminated, \d+ page(s)? scanned", line):
             logging.info('Batch terminated')
-            m = re.search('\d+', line)
+            m = re.search(r"\d+", line)
             scanned_pages = m.group(0)
             event_listener.on_progress_updated({'last_scanned_page': scanned_pages})
             event_listener.on_state_changed({'state': 'scan_complete', 'message': 'Scan complete'})
