@@ -8,7 +8,7 @@ import zipfile
 
 from PIL import Image
 
-import utils
+from . import utils
 
 
 logger = logging.getLogger("scansnap_web")

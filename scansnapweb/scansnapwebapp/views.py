@@ -7,7 +7,10 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from . import utils
+from . import scanner_controller
+
+
+scanner_controller = scanner_controller.ScannerController()
 
 
 @login_required(login_url="/login/")
@@ -18,7 +21,7 @@ def home(request):
 #     return {"scanner_found": True, "scanner_name": "meowscan"}
 
 def get_scanner_info(request):
-    return JsonResponse(utils.get_scanner_info_sync())
+    return JsonResponse(scanner_controller.get_scanner_info_sync())
 
 def scan(request):
     data = json.loads(request.body.decode('utf-8'))
@@ -39,7 +42,7 @@ def scan(request):
     if output_dir_url.endswith('/'):
         logging.error('output_dir_url ending with /')
 
-    utils.scan_and_save_results(
+    scanner_controller.scan_and_save_results(
         sheet_width=data.get("sheet_width"),
         sheet_height=data.get("sheet_height"),
         resolution=data.get("resolution"),
