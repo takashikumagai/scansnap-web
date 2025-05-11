@@ -6,8 +6,6 @@ import threading
 import re
 import zipfile
 
-from PIL import Image
-
 from . import utils
 
 

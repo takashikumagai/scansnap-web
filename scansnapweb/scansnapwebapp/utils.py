@@ -1,5 +1,10 @@
+import logging
 import os
+import subprocess
+import zipfile
 from pathlib import Path
+
+from PIL import Image
 
 
 def get_file_size_in_bytes(pathname):
