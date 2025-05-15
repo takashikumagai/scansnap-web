@@ -176,14 +176,14 @@ function startScan() {
         sides: getSelectedRadioButtonValue('sides'),
         color: getSelectedRadioButtonValue('color'),
         brightness: document.querySelector('#brightness-slider').value,
-        resolution: getSelectedRadioButtonValue('resolution'),
+        resolution: parseInt(getSelectedRadioButtonValue('resolution')),
         output_format: getSelectedRadioButtonValue('output_format'),
         output_page_option: output_option,
         page_rotate_options: rotate_options,
         starting_page_number: starting_page_number
     };
     console.log('scanParams', scanParams);
-    const url = '/scan/'
+    const url = '/scans/'
     console.log('scan url', url);
     const csrftoken = getCsrfTokenFromCookie();
     console.log('csrftoken', csrftoken);

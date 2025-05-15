@@ -57,6 +57,30 @@ wheels = [
 ]
 
 [[package]]
+name = "django-filter"
+version = "25.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b5/40/c702a6fe8cccac9bf426b55724ebdf57d10a132bae80a17691d0cf0b9bac/django_filter-25.1.tar.gz", hash = "sha256:1ec9eef48fa8da1c0ac9b411744b16c3f4c31176c867886e4c48da369c407153", size = 143021, upload_time = "2025-02-14T16:30:53.238Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/a6/70dcd68537c434ba7cb9277d403c5c829caf04f35baf5eb9458be251e382/django_filter-25.1-py3-none-any.whl", hash = "sha256:4fa48677cf5857b9b1347fed23e355ea792464e0fe07244d1fdfb8a806215b80", size = 94114, upload_time = "2025-02-14T16:30:50.435Z" },
+]
+
+[[package]]
+name = "djangorestframework"
+version = "3.16.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/97/112c5a72e6917949b6d8a18ad6c6e72c46da4290c8f36ee5f1c1dcbc9901/djangorestframework-3.16.0.tar.gz", hash = "sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9", size = 1068408, upload_time = "2025-03-28T14:18:42.065Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/3e/2448e93f4f87fc9a9f35e73e3c05669e0edd0c2526834686e949bb1fd303/djangorestframework-3.16.0-py3-none-any.whl", hash = "sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361", size = 1067305, upload_time = "2025-03-28T14:18:39.489Z" },
+]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -109,6 +133,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f2/97/ebf4da567aa6827c909642694d71c9fcf53e5b504f2d96afea02718862f3/iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7", size = 4793, upload_time = "2025-03-19T20:09:59.721Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760", size = 6050, upload_time = "2025-03-19T20:10:01.071Z" },
+]
+
+[[package]]
+name = "markdown"
+version = "3.8"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/15/222b423b0b88689c266d9eac4e61396fe2cc53464459d6a37618ac863b24/markdown-3.8.tar.gz", hash = "sha256:7df81e63f0df5c4b24b7d156eb81e4690595239b7d70937d0409f1b0de319c6f", size = 360906, upload_time = "2025-04-11T14:42:50.928Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/3f/afe76f8e2246ffbc867440cbcf90525264df0e658f8a5ca1f872b3f6192a/markdown-3.8-py3-none-any.whl", hash = "sha256:794a929b79c5af141ef5ab0f2f642d0f7b1872981250230e72682346f7cc90dc", size = 106210, upload_time = "2025-04-11T14:42:49.178Z" },
 ]
 
 [[package]]
@@ -205,7 +238,10 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "django-filter" },
+    { name = "djangorestframework" },
     { name = "httpx" },
+    { name = "markdown" },
     { name = "pillow" },
     { name = "pytest" },
     { name = "ruff" },
@@ -214,7 +250,10 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.2" },
+    { name = "django-filter", specifier = ">=25.1" },
+    { name = "djangorestframework", specifier = ">=3.16.0" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "markdown", specifier = ">=3.8" },
     { name = "pillow", specifier = ">=11.2.1" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "ruff", specifier = ">=0.11.7" },

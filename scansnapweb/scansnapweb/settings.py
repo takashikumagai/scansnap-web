@@ -171,3 +171,7 @@ LOGGING = {
         },
     }
 }
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'scansnapwebapp.exceptions.custom_exception_handler',
+}
